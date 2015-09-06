@@ -1,0 +1,18 @@
+{
+  "name": "openframe-framecontroller",
+  "version": "0.1.0",
+  "description": "The controller software running on the frame.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jonathan Wohl",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "bluebird": "^2.9.34",
+    "commander": "^2.8.1",
+    "ps-tree": "^1.0.0",
+    "socket.io": "^1.3.6",
+    "socket.io-client": "^1.3.6"
+  }
+}
