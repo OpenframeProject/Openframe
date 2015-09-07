@@ -1,9 +1,12 @@
 'use strict';
 
+/**
+ * A small utility for downloading files.
+ */
+
 // Dependencies
 var fs = require('fs'),
     url = require('url'),
-    path = require('path'),
     http = require('http'),
     exec = require('child_process').exec;
 

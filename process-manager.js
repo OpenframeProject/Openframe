@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Starts, stops, and tracks child processes. Used to open artworks with their specified container apps.
+ */
+
+// spawn would be necessary if we wanted to exchange data with child process (maybe for live coding?)
 var spawn = require('child_process').spawn,
     exec = require('child_process').exec,
     psTree = require('ps-tree');
@@ -34,6 +39,9 @@ function killProcess(pid) {
     }
 }
 
+/**
+ * Kill the currently running process (top of the stack)
+ */
 function killCurrentProcess() {
     var cur_proc = getCurrentProcess();
     if (cur_proc) {
@@ -41,6 +49,10 @@ function killCurrentProcess() {
     }
 }
 
+/**
+ * Get the current process id (top of the stack);
+ * @return {Number} pid
+ */
 function getCurrentProcess() {
     if (processStack.length) {
         return processStack[0];
@@ -49,6 +61,10 @@ function getCurrentProcess() {
     }
 }
 
+/**
+ * Attach event handlers to the child processes.
+ * @param  {Process} child
+ */
 function _setupChildProcessEvents(child) {
     child.stdout.on('data', function(data) {
         console.log('stdout: ' + data);
@@ -63,6 +79,12 @@ function _setupChildProcessEvents(child) {
     });
 }
 
+/**
+ * Kill process and all its children.
+ * @param  {Number}   pid      [description]
+ * @param  {String}   signal   [description]
+ * @param  {Function} callback [description]
+ */
 function _killAllDescendents(pid, signal, callback) {
     signal = signal || 'SIGKILL';
     callback = callback || function() {};
@@ -87,12 +109,6 @@ function _killAllDescendents(pid, signal, callback) {
         callback();
     }
 }
-
-
-// setTimeout(function() {
-//     var topPid = processStack[0];
-//     proceses[topPid].kill();
-// }, 3000);
 
 
 exports.startProcess = startProcess;

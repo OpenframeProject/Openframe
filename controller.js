@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * The main controller for the frame.
+ */
+
 // app dependencies
 var config = require('./conf'),
     downloader = require('./downloader'),

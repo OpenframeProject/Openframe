@@ -2,14 +2,10 @@
 var fs = require('fs'),
     pubsub = require('./pubsub');
 
-// require('./artwork');
-// require('./users');
-// require('./frames');
-
-function loadPlugins(socket) {
+function loadPlugins(socket, pubsub) {
   fs.readdirSync('./plugins').forEach(function (file) {
     if (file.substr(-3, 3) === '.js' && file !== 'index.js') {
-      require('./plugins/' + file.replace('.js', ''))(socket);
+      require('./plugins/' + file.replace('.js', ''))(socket, pubsub);
     }
   });
 }
@@ -18,5 +14,5 @@ function loadPlugins(socket) {
 // When the frame connects, load any extensions from the plugins dir
 pubsub.on('connected', function(socket) {
     console.log('loading plugins');
-    loadPlugins(socket);
+    loadPlugins(socket, pubsub);
 });

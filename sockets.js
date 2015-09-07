@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * Small wrapper for the websocket connection (socket.io)
+ */
+
 var io = require('socket.io-client'),
     config = require('./conf'),
     controller = require('./controller'),
@@ -8,9 +12,15 @@ var io = require('socket.io-client'),
 
 var socket;
 
-
+/**
+ * Open the socket connection, and binds the default socket events.
+ *
+ * Emits a 'connected' application event, which triggers loading of extensions.
+ */
 function connect() {
     var url = config.api_protocol + '://' + config.api_domain + ":" + config.api_port;
+
+    console.log(url);
 
     socket = io.connect(url);
 
@@ -20,7 +30,6 @@ function connect() {
     });
 
     socket.on('artwork:update', function(data) {
-        console.log(data);
         controller.changeArtwork(data);
     });
 }

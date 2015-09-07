@@ -1,3 +1,9 @@
+'use strict';
+
+/**
+ * Configuration object.
+ */
+
 module.exports = {
     api_protocol: 'http',
     api_domain: 'localhost',
