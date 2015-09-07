@@ -9,10 +9,16 @@ var config = require('./config'),
     downloader = require('./downloader'),
     url = require('url'),
     path = require('path'),
-    proc_man = require('./process-manager');
+    pubsub = require('./pubsub'),
+    proc_man = require('./process-manager'),
+    brightness = require('brightness');
 
 downloader.setDownloadDir(config('download_dir'));
 
+/**
+ * Display an artwork.
+ * @param  {Object} artwork
+ */
 function changeArtwork(artwork) {
     console.log(artwork);
 
@@ -36,4 +42,66 @@ function changeArtwork(artwork) {
     }
 }
 
-exports.changeArtwork = changeArtwork;
+/**
+ * Turn on the frame display.
+ */
+function displayOn() {
+    switch (config.option('platform')) {
+        case 'mac':
+            break;
+        case 'windows':
+            break;
+        default:
+            // linux
+
+    }
+}
+
+/**
+ * Turn off the frame display.
+ * @return {[type]} [description]
+ */
+function displayOff() {
+    switch (config.option('platform')) {
+        case 'mac':
+            break;
+        case 'windows':
+            break;
+        default:
+            // linux
+    }
+}
+
+/**
+ * Set the frame brightness.
+ * @param {Number} val Brightness value between 0 and 1
+ */
+function setBrightness(val) {
+    brightness.set(val, function() {
+        console.log('brightness set to: ', val);
+    });
+}
+
+/**
+ * Set the frame display rotation.
+ * @param  {Number} val Rotation value in degrees: 0, 90, 180, or 270
+ */
+function rotateDisplay(val) {
+    // TODO
+}
+
+
+// wire up default pubsub 'command' events
+pubsub.on('artwork:update', changeArtwork);
+pubsub.on('display:rotate', rotateDisplay);
+pubsub.on('display:brightness', setBrightness);
+pubsub.on('display:on', displayOn);
+pubsub.on('display:off', displayOff);
+
+
+module.exports = {
+    changeArtwork: changeArtwork,
+    displayOn: displayOn,
+    displayOff: displayOff,
+    setBrightness: setBrightness
+};

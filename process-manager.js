@@ -110,7 +110,7 @@ function _killAllDescendents(pid, signal, callback) {
     }
 }
 
-
+exports.exec = exec;
 exports.startProcess = startProcess;
 exports.killProcess = killProcess;
 exports.killCurrentProcess = killCurrentProcess;

@@ -1,5 +1,7 @@
 'use strict';
 
+var brightness = require('brightness');
+
 /**
  * Example plugin which reads keystrokes from standard in.
  */
@@ -33,6 +35,32 @@ module.exports = function(socket, pubsub) {
         // over the socket connection
         if (key === 'r') {
             socket.emit('artwork:random');
+        }
+
+        if (key === 'u') {
+            brightness.get(function(err, level) {
+                var b = level < 1 ? level + 0.1 : 1;
+                if (b > 1) {
+                    b = 1;
+                }
+                brightness.set(b, function() {
+
+                });
+            });
+
+        }
+
+        if (key === 'd') {
+            brightness.get(function(err, level) {
+                var b = level > 0 ? level - 0.1 : 0;
+                if (b < 0) {
+                    b = 0;
+                }
+                console.log(b);
+                brightness.set(b, function() {
+
+                });
+            });
         }
     });
 };
