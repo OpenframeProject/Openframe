@@ -10,7 +10,7 @@ var fs = require('fs'),
     http = require('http'),
     exec = require('child_process').exec;
 
-var conf = require('./conf');
+var config = require('./config');
 
 function _mkdirp(dir) {
     var mkdir = 'mkdir -p ' + dir;
@@ -30,7 +30,7 @@ function downloadFile(file_url, file_output_name, cb) {
     };
 
     var file_name = file_output_name,
-        file_path = conf.download_dir + file_name,
+        file_path = config('download_dir') + file_name,
         file = fs.createWriteStream(file_path);
 
     http.get(options, function(res) {
@@ -39,14 +39,14 @@ function downloadFile(file_url, file_output_name, cb) {
         }).on('end', function() {
             file.end();
             cb(file);
-            console.log(file_name + ' downloaded to ' + conf.download_dir);
+            console.log(file_name + ' downloaded to ' + config('download_dir'));
         });
     });
 }
 
 function setDownloadDir(dir_path) {
-    conf.download_dir = dir_path || conf.download_dir;
-    _mkdirp(conf.download_dir);
+    config('download_dir', dir_path || config('download_dir'));
+    _mkdirp(config('download_dir'));
 }
 
 exports.setDownloadDir = setDownloadDir;

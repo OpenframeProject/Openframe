@@ -19,3 +19,13 @@ The Frame Controller creates a socket connection with the API server, and is res
 - Manage plugins via API.
 - GPIO integration (https://github.com/JamesBarwell/rpi-gpio.js)
 - Example plugin which uses GPIO
+
+### Usage
+```
+$ ./frame -u username -d api_domain -p api_port -P api_protocol
+```
+
+#### Example
+```
+$ ./frame -u thomas_marx -d api.openframe.io -p 80 -P https
+```

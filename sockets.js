@@ -5,7 +5,7 @@
  */
 
 var io = require('socket.io-client'),
-    config = require('./conf'),
+    config = require('./config'),
     controller = require('./controller'),
     pubsub = require('./pubsub');
 
@@ -18,7 +18,7 @@ var socket;
  * Emits a 'connected' application event, which triggers loading of extensions.
  */
 function connect() {
-    var url = config.api_protocol + '://' + config.api_domain + ":" + config.api_port;
+    var url = config('api_protocol') + '://' + config('api_domain') + ":" + config('api_port');
 
     console.log(url);
 

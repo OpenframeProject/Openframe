@@ -5,13 +5,13 @@
  */
 
 // app dependencies
-var config = require('./conf'),
+var config = require('./config'),
     downloader = require('./downloader'),
     url = require('url'),
     path = require('path'),
     proc_man = require('./process-manager');
 
-downloader.setDownloadDir(config.download_dir);
+downloader.setDownloadDir(config('download_dir'));
 
 function changeArtwork(artwork) {
     console.log(artwork);

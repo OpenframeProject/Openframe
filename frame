@@ -8,7 +8,7 @@
 var program = require('commander');
 
 // app dependencies
-var config = require('./conf'),
+var config = require('./config'),
     sockets = require('./sockets'),
     extensions = require('./extensions');
 
@@ -16,7 +16,7 @@ program
     .version('0.1.0')
     .option('-u, --username <username>', 'Username to which this frame will be linked.')
     .option('-f, --framename <framename>', 'Name for the frame.')
-    .option('-d, --api-dom <api_domain>', 'The domain at which the Openframe API is accessible. Defaults to localhost.')
+    .option('-d, --api-domain <api_domain>', 'The domain at which the Openframe API is accessible. Defaults to localhost.')
     .option('-p, --api-port <api_port>', 'The port at which the Openframe API is accessible. Defaults to 8888.')
     .option('-P, --api-protocol <api_protocol>', 'The domain at which the Openframe API is accessible. Defaults to localhost.')
     .option('-r, --reset', 'If present, reset the configuration, i.e. treat this as an entirely new frame.')
@@ -31,11 +31,11 @@ if (!program.username) {
     console.log('Starting as ' + program.username);
 }
 
-config.username = program.username;
-config.framename = program.framename || 'unnamed';
-config.api_domain = program.api_domain || config.api_domain;
-config.api_protocol = program.api_protocol || config.api_protocol;
-config.api_port = program.api_port || config.api_port;
+config('username', program.username);
+config('framename', program.framename);
+config('api_domain', program.api_domain);
+config('api_protocol', program.api_protocol);
+config('api_port', program.api_port);
 
 // Initiate websocket connection to the api server
 sockets.connect();
