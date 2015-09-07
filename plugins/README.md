@@ -30,7 +30,7 @@ module.exports = function(socket, pubsub) {
         process.stdout.write(key + '\n');
 
         // let's emit a plugin-defined event which could be handled elsewhere
-        // in this plugin, on by other plugins.
+        // in this plugin, or by other plugins.
         pubsub.emit('plugin:keystrokes:keypress', key);
 
         // if 'r' is pressed, emit the built-in artwork:random event
