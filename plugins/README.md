@@ -1,8 +1,8 @@
-## Plugins!
+### Plugins!
 
-The frame controller with load files in this directory and include them as plugins to the frame.
+The app will dynamically load modules placed in the `plugins` directory and include them as extensions to the frame controller software.
 
-Plugins must be modules that export a function which takes two arguments, `socket` and `pubsub`, a reference to socket connection and applicaiton pubsub module, respectively.
+Plugins must be modules that export a function which takes two arguments, `socket` and `pubsub`, references to the socket connection and application pubsub modules, respectively.
 
 See the `keystrokes.js` plugin as an example:
 
