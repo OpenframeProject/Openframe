@@ -34,6 +34,7 @@ config('api_protocol', program.apiprotocol);
 config('api_port', program.apiport);
 
 require('./controller');
-require('./extensions');
+require('./plugins');
+
 // Initiate websocket connection to the api server
 require('./sockets').connect();

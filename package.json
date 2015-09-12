@@ -13,8 +13,11 @@
     "brightness": "^2.2.0",
     "commander": "^2.8.1",
     "ini": "^1.3.4",
+    "jsonfile": "^2.2.1",
     "ps-tree": "^1.0.0",
     "socket.io": "^1.3.6",
-    "socket.io-client": "^1.3.6"
+    "socket.io-client": "^1.3.6",
+    "openframe-gpio": "git@github.com:jmwohl/Openframe-GPIO.git",
+    "openframe-keystroke": "git@github.com:jmwohl/Openframe-Keystroke.git"
   }
 }

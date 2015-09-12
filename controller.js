@@ -92,11 +92,11 @@ function rotateDisplay(val) {
 
 
 // wire up default pubsub 'command' events
-pubsub.on('artwork:update', changeArtwork);
-pubsub.on('display:rotate', rotateDisplay);
-pubsub.on('display:brightness', setBrightness);
-pubsub.on('display:on', displayOn);
-pubsub.on('display:off', displayOff);
+pubsub.on('command:artwork:update', changeArtwork);
+pubsub.on('command:display:rotate', rotateDisplay);
+pubsub.on('command:display:brightness', setBrightness);
+pubsub.on('command:display:on', displayOn);
+pubsub.on('command:display:off', displayOff);
 
 
 module.exports = {
