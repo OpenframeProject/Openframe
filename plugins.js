@@ -3,14 +3,20 @@ var fs = require('fs'),
     jsonfile = require('jsonfile'),
     pubsub = require('./pubsub'),
     exec = require('child_process').exec,
+    config = require('./config'),
     child,
     socket;
 
 // When the frame connects, load any plugins from the plugins dir
 pubsub.on('connected', function(_socket) {
     socket = _socket;
-    console.log('loading plugins');
-    Plugins.installPlugins();
+
+    if (!config('skip_plugins')) {
+        console.log('loading plugins');
+        Plugins.installPlugins();
+    } else {
+        Plugins.initPlugins(socket, pubsub);
+    }
 });
 
 pubsub.on('plugins:installed', function() {

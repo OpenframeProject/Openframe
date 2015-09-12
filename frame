@@ -13,6 +13,7 @@ program
     .option('-d, --apidomain <apidomain>', 'The domain at which the Openframe API is accessible. Defaults to localhost.')
     .option('-p, --apiport <apiport>', 'The port at which the Openframe API is accessible. Defaults to 8888.')
     .option('-P, --apiprotocol <apiprotocol>', 'The domain at which the Openframe API is accessible. Defaults to localhost.')
+    .option('-s --skipplugins', 'Skip installing plugins at startup.')
     .option('-r, --reset', 'If present, reset the configuration, i.e. treat this as an entirely new frame.')
     .parse(process.argv);
 
@@ -25,6 +26,7 @@ if (!program.username) {
     console.log('Starting as ' + program.username);
 }
 
+console.log(program.skipplugins);
 // app dependencies
 var config = require('./config');
 config('username', program.username);
@@ -32,6 +34,7 @@ config('framename', program.framename);
 config('api_domain', program.apidomain);
 config('api_protocol', program.apiprotocol);
 config('api_port', program.apiport);
+config('skip_plugins', program.skipplugins);
 
 require('./controller');
 require('./plugins');
