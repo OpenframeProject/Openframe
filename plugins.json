@@ -1,0 +1,6 @@
+{
+  "plugins": {
+    "openframe-gpio": "git@github.com:jmwohl/Openframe-GPIO.git",
+    "openframe-keystroke": "git@github.com:jmwohl/Openframe-Keystroke.git"
+  }
+}
