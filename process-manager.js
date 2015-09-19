@@ -20,7 +20,10 @@ var processes = {},
  */
 function startProcess(command) {
     console.log('startProcess: ', command);
-    var child = exec(command);
+    var command_ary = command.split(' ');
+    var command_bin = command_ary[0];
+    var command_args = command_ary.slice(1);
+    var child = spawn(command_bin, command_args, {detached: true});
     _setupChildProcessEvents(child);
     processes[child.pid] = child;
     processStack.push(child.pid);
@@ -35,7 +38,12 @@ function startProcess(command) {
 function killProcess(pid) {
     console.log('killProcess: ', pid);
     // processes[pid].kill();
-    _killAllDescendents(pid);
+    // _killAllDescendents(pid);
+    try {
+	process.kill(-pid);
+    } catch(e) {
+	console.log(e);
+    }
     delete processes[pid];
     var stack_idx = processStack.indexOf(pid);
     if (stack_idx !== -1) {
