@@ -30,7 +30,7 @@ function connect() {
     });
 
     socket.on('command:artwork:update', function(data) {
-        console.log('command:artwork:update', data);
+        console.log('command:artwork:update');
         pubsub.emit('command:artwork:update', data);
     });
 
