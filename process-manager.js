@@ -91,7 +91,7 @@ function _setupChildProcessEvents(child) {
  * @param  {Function} callback [description]
  */
 function _killAllDescendents(pid, signal, callback) {
-    console('_killAllDescendents: ', pid);
+    console.log('_killAllDescendents: ', pid);
     signal = signal || 'SIGKILL';
     callback = callback || function() {};
     var killTree = true;
