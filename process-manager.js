@@ -80,7 +80,7 @@ function _setupChildProcessEvents(child) {
     });
 
     child.on('close', function(code) {
-        console.log('closing code: ' + code);
+        console.log('child ' + child.pid + ' closing code: ' + code);
     });
 }
 
