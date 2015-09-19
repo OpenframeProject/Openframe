@@ -10,7 +10,7 @@ var spawn = require('child_process').spawn,
     psTree = require('ps-tree');
 
 // module members
-var proceses = {},
+var processes = {},
     processStack = [];
 
 
@@ -19,10 +19,13 @@ var proceses = {},
  * @param  {String} command The command to execute.
  */
 function startProcess(command) {
+    console.log('startProcess: ', command);
     var child = exec(command);
     _setupChildProcessEvents(child);
-    proceses[child.pid] = child;
+    processes[child.pid] = child;
     processStack.push(child.pid);
+    console.log('processes: ', processes);
+    console.log('processStack: ', processStack);
 }
 
 /**
@@ -30,9 +33,10 @@ function startProcess(command) {
  * @param  {Number} pid The process id of the process to kill.
  */
 function killProcess(pid) {
-    // proceses[pid].kill();
+    console.log('killProcess: ', pid);
+    // processes[pid].kill();
     _killAllDescendents(pid);
-    delete proceses[pid];
+    delete processes[pid];
     var stack_idx = processStack.indexOf(pid);
     if (stack_idx !== -1) {
         processStack.splice(stack_idx, 1);
@@ -43,6 +47,7 @@ function killProcess(pid) {
  * Kill the currently running process (top of the stack)
  */
 function killCurrentProcess() {
+    console.log('killCurrentProcess');
     var cur_proc = getCurrentProcess();
     if (cur_proc) {
         killProcess(cur_proc);
@@ -86,6 +91,7 @@ function _setupChildProcessEvents(child) {
  * @param  {Function} callback [description]
  */
 function _killAllDescendents(pid, signal, callback) {
+    console('_killAllDescendents: ', pid);
     signal = signal || 'SIGKILL';
     callback = callback || function() {};
     var killTree = true;
