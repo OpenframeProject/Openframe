@@ -11,6 +11,7 @@ var config = require('./config'),
     path = require('path'),
     pubsub = require('./pubsub'),
     proc_man = require('./process-manager'),
+    aw = require('./artwork'),
     brightness = require('brightness');
 
 downloader.setDownloadDir(config('download_dir'));
@@ -22,23 +23,42 @@ downloader.setDownloadDir(config('download_dir'));
 function changeArtwork(artwork) {
     console.log(artwork);
 
+    var curArt = aw.getCurrentArtwork();
+
     if (artwork.format.download) {
         var parsed = url.parse(artwork.url),
             file_name = path.basename(parsed.pathname);
 
         downloader.downloadFile(artwork.url, artwork._id + file_name, function(file) {
             console.log('file downloaded: ', file);
-
-            var command = artwork.format.player + ' ' + file.path;
+            var command = artwork.format.start_command + ' ' + file.path;
             console.log(command);
-            proc_man.killCurrentProcess();
-            proc_man.startProcess(command);
+            if (curArt) {
+                proc_man.exec(curArt.format.end_command, function() {
+                    proc_man.startProcess(command);
+                    // proc_man.killCurrentProcess();
+                    aw.setCurrentArtwork(artwork);
+                });
+            } else {
+                proc_man.startProcess(command);
+                // proc_man.killCurrentProcess();
+                aw.setCurrentArtwork(artwork);
+            }
         });
     } else {
-        var command = artwork.format.player + ' ' + artwork.url;
+        var command = artwork.format.start_command + ' ' + artwork.url;
         console.log(command);
-        proc_man.killCurrentProcess();
-        proc_man.startProcess(command);
+        if (curArt) {
+            proc_man.exec(curArt.format.end_command, function() {
+                proc_man.startProcess(command);
+                // proc_man.killCurrentProcess();
+                aw.setCurrentArtwork(artwork);
+            });
+        } else {
+            proc_man.startProcess(command);
+            // proc_man.killCurrentProcess();
+            aw.setCurrentArtwork(artwork);
+        }
     }
 }
 

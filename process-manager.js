@@ -19,16 +19,21 @@ var processes = {},
  * @param  {String} command The command to execute.
  */
 function startProcess(command) {
-    console.log('startProcess: ', command);
+    // console.log('startProcess: ', command);
     var command_ary = command.split(' ');
     var command_bin = command_ary[0];
     var command_args = command_ary.slice(1);
-    var child = spawn(command_bin, command_args, {detached: true});
-    _setupChildProcessEvents(child);
-    processes[child.pid] = child;
-    processStack.push(child.pid);
-    console.log('processes: ', processes);
-    console.log('processStack: ', processStack);
+    command_args.push('&>/dev/null');
+    _blankScreen(function() {
+        var child = spawn(command_bin, command_args, {
+            // this is necessary in order to get glslViewer to display correctly:
+            // https://nodejs.org/api/child_process.html#child_process_options_stdio
+            stdio: 'inherit'
+        });
+        _setupChildProcessEvents(child);
+        processes[child.pid] = child;
+        processStack.push(child.pid);
+    });
 }
 
 /**
@@ -36,9 +41,9 @@ function startProcess(command) {
  * @param  {Number} pid The process id of the process to kill.
  */
 function killProcess(pid) {
-    console.log('killProcess: ', pid);
+    // console.log('killProcess: ', pid);
     // processes[pid].kill();
-    // _killAllDescendents(pid);
+    _killAllDescendents(pid);
     try {
 	process.kill(-pid);
     } catch(e) {
@@ -55,7 +60,7 @@ function killProcess(pid) {
  * Kill the currently running process (top of the stack)
  */
 function killCurrentProcess() {
-    console.log('killCurrentProcess');
+    // console.log('killCurrentProcess');
     var cur_proc = getCurrentProcess();
     if (cur_proc) {
         killProcess(cur_proc);
@@ -79,13 +84,17 @@ function getCurrentProcess() {
  * @param  {Process} child
  */
 function _setupChildProcessEvents(child) {
-    child.stdout.on('data', function(data) {
-        console.log('stdout: ' + data);
-    });
+    if (child.stdout) {
+        child.stdout.on('data', function(data) {
+            console.log('stdout: ' + data);
+        });
+    }
 
-    child.stderr.on('data', function(data) {
-        console.log('stdout: ' + data);
-    });
+    if (child.stderr) {
+        child.stderr.on('data', function(data) {
+            console.log('stdout: ' + data);
+        });
+    }
 
     child.on('close', function(code) {
         console.log('child ' + child.pid + ' closing code: ' + code);
@@ -122,6 +131,14 @@ function _killAllDescendents(pid, signal, callback) {
         } catch (ex) {}
         callback();
     }
+}
+
+/**
+ * Write 0s to the framebuffer in order to ensure a black screen.
+ */
+function _blankScreen(cb) {
+    cb = cb || function() {};
+    exec('dd if=/dev/zero of=/dev/fb0', cb);
 }
 
 exports.exec = exec;
