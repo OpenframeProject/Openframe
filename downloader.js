@@ -21,7 +21,15 @@ function _mkdirp(dir) {
     });
 }
 
-// Function to download file using HTTP.get
+/**
+ * Download a file using HTTP get.
+ *
+ * TODO: use Promises instead of a callback.
+ *
+ * @param  {String}   file_url
+ * @param  {String}   file_output_name
+ * @param  {Function} cb
+ */
 function downloadFile(file_url, file_output_name, cb) {
     var options = {
         host: url.parse(file_url).host,
@@ -44,6 +52,10 @@ function downloadFile(file_url, file_output_name, cb) {
     });
 }
 
+/**
+ * Set the download directory.
+ * @param {String} dir_path
+ */
 function setDownloadDir(dir_path) {
     config('download_dir', dir_path || config('download_dir'));
     _mkdirp(config('download_dir'));

@@ -29,17 +29,17 @@ function connect() {
         pubsub.emit('connected', socket);
     });
 
-    socket.on('artwork:update', function(data) {
-        console.log('artwork:update', data);
-        pubsub.emit('artwork:update', data);
+    socket.on('command:artwork:update', function(data) {
+        console.log('command:artwork:update');
+        pubsub.emit('command:artwork:update', data);
     });
 
     socket.on('display:off', function() {
-        pubsub.emit('display:off');
+        pubsub.emit('command:display:off');
     });
 
     socket.on('display:on', function() {
-        pubsub.emit('display:on');
+        pubsub.emit('command:display:on');
     });
 }
 
@@ -50,7 +50,6 @@ function connect() {
 function getSocket() {
     return socket;
 }
-
 
 
 exports.connect = connect;

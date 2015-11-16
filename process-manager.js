@@ -10,7 +10,7 @@ var spawn = require('child_process').spawn,
     psTree = require('ps-tree');
 
 // module members
-var proceses = {},
+var processes = {},
     processStack = [];
 
 
@@ -19,10 +19,21 @@ var proceses = {},
  * @param  {String} command The command to execute.
  */
 function startProcess(command) {
-    var child = exec(command);
-    _setupChildProcessEvents(child);
-    proceses[child.pid] = child;
-    processStack.push(child.pid);
+    // console.log('startProcess: ', command);
+    var command_ary = command.split(' ');
+    var command_bin = command_ary[0];
+    var command_args = command_ary.slice(1);
+    command_args.push('&>/dev/null');
+    _blankScreen(function() {
+        var child = spawn(command_bin, command_args, {
+            // this is necessary in order to get glslViewer to display correctly:
+            // https://nodejs.org/api/child_process.html#child_process_options_stdio
+            stdio: 'inherit'
+        });
+        _setupChildProcessEvents(child);
+        processes[child.pid] = child;
+        processStack.push(child.pid);
+    });
 }
 
 /**
@@ -30,9 +41,15 @@ function startProcess(command) {
  * @param  {Number} pid The process id of the process to kill.
  */
 function killProcess(pid) {
-    // proceses[pid].kill();
+    // console.log('killProcess: ', pid);
+    // processes[pid].kill();
     _killAllDescendents(pid);
-    delete proceses[pid];
+    try {
+	process.kill(-pid);
+    } catch(e) {
+	console.log(e);
+    }
+    delete processes[pid];
     var stack_idx = processStack.indexOf(pid);
     if (stack_idx !== -1) {
         processStack.splice(stack_idx, 1);
@@ -43,6 +60,7 @@ function killProcess(pid) {
  * Kill the currently running process (top of the stack)
  */
 function killCurrentProcess() {
+    // console.log('killCurrentProcess');
     var cur_proc = getCurrentProcess();
     if (cur_proc) {
         killProcess(cur_proc);
@@ -66,16 +84,20 @@ function getCurrentProcess() {
  * @param  {Process} child
  */
 function _setupChildProcessEvents(child) {
-    child.stdout.on('data', function(data) {
-        console.log('stdout: ' + data);
-    });
+    if (child.stdout) {
+        child.stdout.on('data', function(data) {
+            console.log('stdout: ' + data);
+        });
+    }
 
-    child.stderr.on('data', function(data) {
-        console.log('stdout: ' + data);
-    });
+    if (child.stderr) {
+        child.stderr.on('data', function(data) {
+            console.log('stdout: ' + data);
+        });
+    }
 
     child.on('close', function(code) {
-        console.log('closing code: ' + code);
+        console.log('child ' + child.pid + ' closing code: ' + code);
     });
 }
 
@@ -86,6 +108,7 @@ function _setupChildProcessEvents(child) {
  * @param  {Function} callback [description]
  */
 function _killAllDescendents(pid, signal, callback) {
+    console.log('_killAllDescendents: ', pid);
     signal = signal || 'SIGKILL';
     callback = callback || function() {};
     var killTree = true;
@@ -108,6 +131,14 @@ function _killAllDescendents(pid, signal, callback) {
         } catch (ex) {}
         callback();
     }
+}
+
+/**
+ * Write 0s to the framebuffer in order to ensure a black screen.
+ */
+function _blankScreen(cb) {
+    cb = cb || function() {};
+    exec('dd if=/dev/zero of=/dev/fb0', cb);
 }
 
 exports.exec = exec;
