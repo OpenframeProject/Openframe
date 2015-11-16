@@ -30,6 +30,8 @@ $ ./frame [options]
 ```
 
 #### Options
+
+```
 -h, --help                       output usage information
 -V, --version                    output the version number
 -u, --username <username>        Username to which this frame will be linked.
@@ -38,7 +40,7 @@ $ ./frame [options]
 -p, --apiport <apiport>          The port at which the Openframe API is accessible. Defaults to 8888.
 -P, --apiprotocol <apiprotocol>  The domain at which the Openframe API is accessible. Defaults to localhost.
 -i --installplugins              Install (or re-install) plugins at startup.
-
+```
 
 ### Example:
 ```
