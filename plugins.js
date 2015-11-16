@@ -1,6 +1,5 @@
 'use strict';
-var fs = require('fs'),
-    jsonfile = require('jsonfile'),
+var jsonfile = require('jsonfile'),
     pubsub = require('./pubsub'),
     exec = require('child_process').exec,
     config = require('./config'),
@@ -11,37 +10,33 @@ var fs = require('fs'),
 pubsub.on('connected', function(_socket) {
     socket = _socket;
 
-    if (!config('skip_plugins')) {
+    if (config('install_plugins')) {
         console.log('loading plugins');
-        Plugins.installPlugins();
+        installPlugins();
     } else {
-        Plugins.initPlugins(socket, pubsub);
+        initPlugins(socket, pubsub);
     }
 });
 
 pubsub.on('plugins:installed', function() {
-    console.log('loading plugins');
-    Plugins.initPlugins(socket, pubsub);
+    initPlugins(socket, pubsub);
 });
 
 
-var Plugins = (function() {
+
 
     /**
-     * Adds a package to the package.json file.
+     * Adds a dependency to the package.json file.
+     *
      * @param {String} package_name the name of the package, e.g. openframe-gpio
      * @param {String} version      the version of the package, or the git repo location
      */
-    function _addToPackages(package_name, version, do_install) {
-        do_install = do_install === true;
+    function _addDependency(package_name, version) {
         var package_file = './package.json';
 
         jsonfile.readFile(package_file, function(err, obj) {
             if (err) {
                 console.error(err);
-                // if file doesn't exist, create it.
-                // var new_obj = { plugins: {} };
-                // new_obj.plugins[package_name] = version;
             }
             obj.dependencies = obj.dependencies || {};
             obj.dependencies[package_name] = version;
@@ -53,20 +48,28 @@ var Plugins = (function() {
                 if (err) {
                     return;
                 }
-                if (do_install) {
-                    _installPackages();
-                }
             });
         });
     }
 
     /**
-     * Installs the packages via npm install.
+     * Installs the npm dependencies via npm install.
+     *
+     * TODO: maybe reload the application? or at least run initPlugins?
+     * @param  {[type]} package_name [description]
      */
-    function _installPackages() {
-        // TODO: maybe reload the application? or at least run initPlugins?
+    function _installNpmDependencies(package_name, version) {
+        package_name = package_name || '';
+        version = version || '';
+        var npmPackage = (package_name ? ' "' + package_name : '') + (version ? ':' + version + '"' : '');
+        if (npmPackage !== '') {
+            npmPackage += ' --save';
+            // _addDependency(package_name, version);
+        }
+        var command = 'npm install' + npmPackage;
 
-        child = exec('npm install',
+        // TODO: exec this through process manager?
+        child = exec(command,
             function(error, stdout, stderr) {
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);
@@ -75,7 +78,19 @@ var Plugins = (function() {
                 }
             });
 
-        child.on('exit', function(exit_code, signal) {
+        if (child.stdout) {
+            child.stdout.on('data', function(data) {
+                console.log('stdout: ' + data);
+            });
+        }
+
+        if (child.stderr) {
+            child.stderr.on('data', function(data) {
+                console.log('stdout: ' + data);
+            });
+        }
+
+        child.on('exit', function(exit_code) {
             if (exit_code === 0) {
                 pubsub.emit('plugins:installed');
             }
@@ -83,17 +98,17 @@ var Plugins = (function() {
     }
 
     /**
-     * Add the plugins listed in plugins.json to package.json.
+     * Add the plugins listed in .ofrc to package.json.
      *
      * By default, npm install will be run at the end. To stop this,
      * pass false as the first argument.
      *
      * @param {Boolean} do_install Whether or not to run npm install. Defaults to true.
      */
-    function _addPluginsToPackages(do_install) {
+    function _addPluginsToDependencies(do_install) {
         do_install = do_install !== false;
         // load plugins file and add this thing.
-        var plugins_file = './plugins.json',
+        var plugins_file = './.ofrc',
             package_file = './package.json';
 
         // open plugins file
@@ -126,7 +141,7 @@ var Plugins = (function() {
                     }
                     // install the packages if so chosen
                     if (do_install) {
-                        _installPackages();
+                        _installNpmDependencies();
                     }
                 });
             });
@@ -134,41 +149,24 @@ var Plugins = (function() {
     }
 
     /**
-     * Install all of the plugins currently listed in plugins.json
+     * Install all of the plugins currently listed in .ofrc
      */
     function installPlugins() {
-        _addPluginsToPackages();
+        _addPluginsToDependencies();
     }
 
-
-    function initPlugins(socket, pubsub) {
-        console.log('initPlugins()');
-        // load plugins file and add this thing.
-        var plugins_file = './plugins.json';
-
-        jsonfile.readFile(plugins_file, function(err, obj) {
-            console.log(obj);
-            if (err) {
-                console.error(err);
-                return;
-            }
-            obj.plugins = obj.plugins || {};
-
-            for (var key in obj.plugins) {
-                if (obj.plugins.hasOwnProperty(key)) {
-                    console.log('requiring ', key);
-                    require(key)(socket, pubsub);
-                }
-            }
-        });
-    }
-
-
-    function installPlugin(package_name, version) {
+    /**
+     * Add a plugin to the .ofrc file.
+     *
+     * @param  {[type]} package_name [description]
+     * @param  {[type]} version      [description]
+     * @return {[type]}              [description]
+     */
+    function addPlugin(package_name, version) {
         version = version || '*';
 
         // load plugins file and add this thing.
-        var plugins_file = './plugins.json';
+        var plugins_file = './.ofrc';
 
         jsonfile.readFile(plugins_file, function(err, obj) {
             if (err) {
@@ -183,17 +181,69 @@ var Plugins = (function() {
             jsonfile.writeFile(plugins_file, obj, {
                 spaces: 2
             }, function(err) {
-                console.error(err);
-
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                _installNpmDependencies(package_name);
             });
         });
     }
 
-    return {
-        installPlugins: installPlugins,
-        installPlugin: installPlugin,
-        initPlugins: initPlugins
-    };
-})();
+    /**
+     * Initialize all of the plugins.
+     *
+     * Assumes all of the plugins in .ofrc have been installed.
+     *
+     * @param  {Object} socket Access to the websocket connection.
+     * @param  {Object} pubsub Access to the frame pubsub system.
+     */
+    function initPlugins(socket, pubsub) {
+        console.log('initPlugins()');
+        // load plugins file and add this thing.
+        var plugins_file = './.ofrc';
 
-module.exports = Plugins;
+        jsonfile.readFile(plugins_file, function(err, obj) {
+            console.log(obj);
+            if (err) {
+                console.error(err);
+                return;
+            }
+            obj.plugins = obj.plugins || {};
+
+            for (var key in obj.plugins) {
+                if (obj.plugins.hasOwnProperty(key)) {
+                    console.log('requiring ', key);
+                    var plugin;
+                    try {
+                        plugin = require(key)(socket, pubsub);
+                    } catch(e) {
+                        console.log('The ' + key + ' plugin hasn\'nt been installed.');
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Check to see if a package is currently installed.
+     *
+     * TODO: should be we checking the node_modules dir, or
+     * is checking package.json dependencies enough?
+     *
+     * @param  {String} package_name The name of the package
+     * @param  {String} version      The version or repo path of the package
+     * @return {Boolean}             True if package already installed
+     */
+    function checkDepInstalled(package_name, version) {
+
+    }
+
+
+
+module.exports = {
+    installPlugins: installPlugins,
+    updatePlugins: _addPluginsToDependencies,
+    addPlugin: addPlugin,
+    initPlugins: initPlugins
+};

@@ -24,16 +24,44 @@ The Frame Controller creates a socket connection with the API server, and is res
 
 ### Usage
 ```
-$ ./frame -u username -d api_domain -p api_port -P api_protocol
+$ ./frame [options]
 ```
-Example:
+
+#### Options
+-h, --help                       output usage information
+-V, --version                    output the version number
+-u, --username <username>        Username to which this frame will be linked.
+-f, --framename <framename>      Name for the frame.
+-d, --apidomain <apidomain>      The domain at which the Openframe API is accessible. Defaults to localhost.
+-p, --apiport <apiport>          The port at which the Openframe API is accessible. Defaults to 8888.
+-P, --apiprotocol <apiprotocol>  The domain at which the Openframe API is accessible. Defaults to localhost.
+-i --installplugins              Install (or re-install) plugins at startup.
+
+
+### Example:
 ```
 $ ./frame -u thomas_marx -d api.openframe.io -p 80 -P https
 ```
 
-### Plugins!
+### Plugins
 
-The app will dynamically load modules placed in the `plugins` directory and include them as extensions to the frame controller software.
+#### Plugin Installation
+
+Plugins are managed as dependencies through NPM. The .ofrc file, in the app root dir, contains a JSON configuration object which has a property called `plugins`. This property is an object of the same form as the NPM package.json's `dependencies` property:
+
+```json
+{
+    "plugins": {
+        "openframe-gpio": "~0.1.0"
+    }
+}
+```
+
+Upon starting up the frame, the Plugins module will iterate through the `plugins` property in .ofrc, check whether each plugin has been installed, and if not go ahead and add it to package.json as a dependency and install it.
+
+Once all plugins are installed, they are each individually initialized by calling their exported function, passing in a reference to the frame's socket connection and event system.
+
+#### Writing Plugins
 
 Plugins must be modules that export a function which takes two arguments, `socket` and `pubsub`, references to the socket connection and application pubsub modules, respectively.
 

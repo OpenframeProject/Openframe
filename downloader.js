@@ -23,6 +23,9 @@ function _mkdirp(dir) {
 
 /**
  * Download a file using HTTP get.
+ *
+ * TODO: use Promises instead of a callback.
+ *
  * @param  {String}   file_url
  * @param  {String}   file_output_name
  * @param  {Function} cb
