@@ -14,14 +14,14 @@ The block diagram below represents a proposed architecture for the Openframe pla
 
 #### Modules
 
-- `frame` - node script which starts the frame software
-- `controller.js` - manages the actions around controlling the frame (changing artwork, updating settings, etc.)
-- `process-manager.js` - manages starting and stopping processes for displaying artworks
-- `pubsub.js` - used for intra-application communication
-- `sockets.js` - sets up and provides the websocket connection to the server
-- `downloader.js` - utility for downloading files
-- `conf.js` - default configuration options
-- `plugins.js` - manages installing and initializing plugins
+* `frame` - node script which starts the frame software
+* `controller.js` - manages the actions around controlling the frame (changing artwork, updating settings, etc.)
+* `process-manager.js` - manages starting and stopping processes for displaying artworks
+* `pubsub.js` - used for intra-application communication
+* `sockets.js` - sets up and provides the websocket connection to the server
+* `downloader.js` - utility for downloading files
+* `conf.js` - default configuration options
+* `plugins.js` - manages installing and initializing plugins
 
 
 ### Usage
@@ -30,6 +30,7 @@ $ ./frame [options]
 ```
 
 #### Options
+```
 -h, --help                       output usage information
 -V, --version                    output the version number
 -u, --username <username>        Username to which this frame will be linked.
@@ -38,7 +39,7 @@ $ ./frame [options]
 -p, --apiport <apiport>          The port at which the Openframe API is accessible. Defaults to 8888.
 -P, --apiprotocol <apiprotocol>  The domain at which the Openframe API is accessible. Defaults to localhost.
 -i --installplugins              Install (or re-install) plugins at startup.
-
+```
 
 ### Example:
 ```
@@ -110,7 +111,9 @@ module.exports = function(socket, pubsub) {
 
 ### TODOs / Considerations / Questions
 
-* Auto-updating code. (e.g. https://github.com/grapeot/learn-expressjs/blob/master/bootstrap.js)
+* Make sure plugins aren't re-installed if they already have been
+* Auto-updating code? (e.g. https://github.com/grapeot/learn-expressjs/blob/master/bootstrap.js)
+* Other code deployment approach? (e.g. chef, puppet, docker?)
 * Manage plugins via API.
 * Example plugins (e.g. GPIO access)
 * How do artworks interact with plugins?
