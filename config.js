@@ -1,13 +1,17 @@
-'use strict';
-
 /**
  * Configuration module
  */
 
+var jsonfile = require('jsonfile'),
+    debug = require('debug')('config'),
+    ofrc_file = './.ofrc',
+
+    config = module.exports = {};
 /**
  * try to detect the device platform (i.e. linux, mac, windows)
  * @return {String} the platform
  */
+/*
 function getPlatform() {
     console.log(process.platform);
 
@@ -19,26 +23,42 @@ function getPlatform() {
         return 'windows';
     }
 }
+*/
 
-module.exports = (function() {
-    var options = {
-        api_protocol: 'http',
-        api_domain: 'localhost',
-        api_port: '8888',
-        download_dir: './artwork/',
-        platform: getPlatform()
-    };
 
-    function option(name, value) {
-        if (!name) {
-            return undefined;
-        }
+config.ofrc = {};
 
-        if (value !== undefined) {
-            options[name] = value;
-        }
-        return options[name];
-    }
+config.save = function() {
+    debug('save');
+    var self = this,
+        p = new Promise(function(resolve, reject) {
+            jsonfile.writeFile(ofrc_file, self.ofrc, {
+                spaces: 2
+            }, function(err) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(self.ofrc);
+            });
+        });
 
-    return option;
-})();
+    return p;
+};
+
+config.load = function() {
+    debug('load');
+    var self = this,
+        p = new Promise(function(resolve, reject) {
+            jsonfile.readFile(ofrc_file, function(err, ofrc) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                self.ofrc = ofrc;
+                resolve(self.ofrc);
+            });
+        });
+
+    return p;
+};

@@ -7,10 +7,8 @@
 // spawn would be necessary if we wanted to exchange data with child process (maybe for live coding?)
 var spawn = require('child_process').spawn,
     exec = require('child_process').exec,
-    psTree = require('ps-tree');
 
-// module members
-var processes = {},
+    processes = {},
     processStack = [];
 
 
@@ -20,9 +18,10 @@ var processes = {},
  */
 function startProcess(command) {
     // console.log('startProcess: ', command);
-    var command_ary = command.split(' ');
-    var command_bin = command_ary[0];
-    var command_args = command_ary.slice(1);
+    var command_ary = command.split(' '),
+        command_bin = command_ary[0],
+        command_args = command_ary.slice(1);
+
     command_args.push('&>/dev/null');
     _blankScreen(function() {
         var child = spawn(command_bin, command_args, {
@@ -43,11 +42,11 @@ function startProcess(command) {
 function killProcess(pid) {
     // console.log('killProcess: ', pid);
     // processes[pid].kill();
-    _killAllDescendents(pid);
+    // _killAllDescendents(pid);
     try {
-	process.kill(-pid);
-    } catch(e) {
-	console.log(e);
+        process.kill(-pid);
+    } catch (e) {
+        console.log(e);
     }
     delete processes[pid];
     var stack_idx = processStack.indexOf(pid);
@@ -102,42 +101,10 @@ function _setupChildProcessEvents(child) {
 }
 
 /**
- * Kill process and all its children.
- * @param  {Number}   pid      [description]
- * @param  {String}   signal   [description]
- * @param  {Function} callback [description]
- */
-function _killAllDescendents(pid, signal, callback) {
-    console.log('_killAllDescendents: ', pid);
-    signal = signal || 'SIGKILL';
-    callback = callback || function() {};
-    var killTree = true;
-    if (killTree) {
-        psTree(pid, function(err, children) {
-            [pid].concat(
-                children.map(function(p) {
-                    return p.PID;
-                })
-            ).forEach(function(tpid) {
-                try {
-                    process.kill(tpid, signal);
-                } catch (ex) {}
-            });
-            callback();
-        });
-    } else {
-        try {
-            process.kill(pid, signal);
-        } catch (ex) {}
-        callback();
-    }
-}
-
-/**
  * Write 0s to the framebuffer in order to ensure a black screen.
  */
-function _blankScreen(cb) {
-    cb = cb || function() {};
+function _blankScreen(_cb) {
+    var cb = _cb || function() {};
     exec('dd if=/dev/zero of=/dev/fb0', cb);
 }
 

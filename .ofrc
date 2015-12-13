@@ -1,6 +1,16 @@
 {
-  "plugins": {
-    "openframe-gpio": "git+https://git@github.com/jmwohl/Openframe-GPIO.git",
-    "openframe-keystroke": "git+https://git@github.com/jmwohl/Openframe-Keystroke.git"
-  }
+  "auth": {
+    "username": "jon",
+    "password": "asdf",
+    "access_token": "Ce3xzv7DOntd8CiTEHa4XAx2XRFm0XEr82zKBUI8NrFPNRO0cqT0LuSGPSidzlAm"
+  },
+  "network": {
+    "api_protocol": "http",
+    "api_domain": "localhost",
+    "api_port": "8888",
+    "pubsub_protocol": "http",
+    "pubsub_domain": "localhost",
+    "pubsub_port": "8889"
+  },
+  "download_dir": "./artwork/"
 }
