@@ -1,7 +1,7 @@
 {
-  "name": "openframe-framecontroller",
+  "name": "openframe",
   "version": "0.1.0",
-  "description": "The controller software running on the frame.",
+  "description": "Openframe controller module.",
   "main": "index.js",
   "scripts": {
     "start": "node .",
@@ -10,12 +10,10 @@
   "author": "Jonathan Wohl",
   "license": "GPL-3.0",
   "dependencies": {
-    "brightness": "^2.2.0",
     "commander": "^2.8.1",
     "faye": "^1.1.2",
     "inquirer": "^0.11.1",
     "jsonfile": "^2.2.1",
-    "loopback": "^2.26.2",
     "openframe-glslviewer": "git+https://git@github.com/OpenframeProject/Openframe-glslViewer.git",
     "openframe-image": "git+https://git@github.com/OpenframeProject/Openframe-Image.git",
     "swagger-client": "^2.1.9"

@@ -17,10 +17,10 @@
 
 var inquirer = require('inquirer'),
     debug = require('debug')('index'),
-    config = require('./config'),
-    rest = require('./rest'),
-    frame = require('./frame'),
-    frame_controller = require('./controller'),
+    config = require('./src/config'),
+    rest = require('./src/rest'),
+    frame = require('./src/frame'),
+    frame_controller = require('./src/controller'),
     initializers;
 
 // load config and frame

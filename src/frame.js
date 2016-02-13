@@ -32,6 +32,16 @@ frame.save = function(persist) {
     debug('save');
     var _persist = persist === false ? false : true;
 
+    // careful about circular saving... save on the server triggers save locally, triggers save to server, etc...
+    rest.client.Frame.Frame_upsert({
+            data: frame.state,
+            id: frame.state.id
+        })
+        .then(function(data) {
+            debug('saved!');
+        })
+        .catch(console.log);
+
     // TODO: save to server
     if (_persist) {
         frame.persistStateToFile();

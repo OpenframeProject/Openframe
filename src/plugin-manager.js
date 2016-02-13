@@ -124,6 +124,9 @@ function _installPlugin(package_name, version, force) {
                     // only install if it's not already installed.
                     _runNpmCommand(cmd).then(function() {
                         resolve(package_name);
+                    }).catch(function(err) {
+                        debug('Could not install', package_name, version);
+                        reject(err);
                     });
                 } else {
                     // otherwise just resolve

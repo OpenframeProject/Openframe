@@ -132,7 +132,7 @@ fc.registerNewFrame = function(userId) {
     debug('registerNewFrame', userId);
 
     return new Promise(function(resolve, reject) {
-        rest.client.OpenframeUser.OpenframeUser_prototype_create_frames({
+        rest.client.OpenframeUser.OpenframeUser_prototype_create_owned_frames({
             data: {
                 name: frame.state.name
             },
@@ -144,6 +144,9 @@ fc.registerNewFrame = function(userId) {
             pm.installPlugins(frame.state.plugins)
                 .then(function() {
                     resolve(frame.state);
+                })
+                .catch(function(err) {
+                    reject(err);
                 });
             // update the plugins
             // fc.updatePlugins(frame)
