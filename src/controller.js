@@ -148,11 +148,6 @@ fc.registerNewFrame = function(userId) {
                 .catch(function(err) {
                     reject(err);
                 });
-            // update the plugins
-            // fc.updatePlugins(frame)
-            //     .then(function() {
-            //         resolve(frame.state);
-            //     });
         }).catch(function(err) {
             debug(err);
             reject(err);

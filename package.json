@@ -1,13 +1,27 @@
 {
   "name": "openframe",
   "version": "0.1.0",
-  "description": "Openframe controller module.",
+  "description": "Openframe controller process which runs on the machine controlling the frame.",
   "main": "index.js",
   "scripts": {
     "start": "node .",
     "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
   },
-  "author": "Jonathan Wohl",
+  "bin": {
+    "openframe": "./cli.js"
+  },
+  "preferGlobal": true,
+  "author": {
+    "name": "Jonathan Wohl",
+    "url": "http://jonathanwohl.com"
+  },
+  "contributors": [{
+    "name": "Jonathan Wohl",
+    "url": "http://jonathanwohl.com"
+  },{
+    "name": "Ishac Bertran",
+    "url": "http://ishacbertran.com"
+  }],
   "license": "GPL-3.0",
   "dependencies": {
     "commander": "^2.8.1",
@@ -24,5 +38,9 @@
     "mocha": "^2.3.4",
     "npm": "^3.5.3",
     "sinon": "^1.17.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenframeProject/Openframe"
   }
 }

@@ -27,7 +27,7 @@ ps.init = function(fc) {
         ps.client.publish('/frame/connected', frame.state.id);
     });
 
-    ps.client.subscribe('/frame/updated/' + frame.state.id, function(data) {
+    ps.client.subscribe('/frame/' + frame.state.id + '/updated', function(data) {
         console.log(data);
         frame.fetch()
             .then(fc.changeArtwork);
