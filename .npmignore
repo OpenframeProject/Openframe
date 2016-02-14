@@ -1,0 +1,4 @@
+.eslintignore
+.eslintrc.yml
+.jsbeautifyrc
+test/*
