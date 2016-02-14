@@ -1,16 +1,14 @@
 # Openframe Frame Controller
 
-The Openframe Frame Controller application (POC).
-
 > Note: This repo is under development and is not ready for use.
 
 ### Design Notes
 
-This prototype of the FrameController is written in Node.js, and acts as a process manager for starting, stopping, and transitioning between artworks. It communicates with the [Openframe-API](https://github.com/OpenframeProject/Openframe-API) server via a REST Api, and connects to the [global event system](https://github.com/OpenframeProject/Openframe-PubSubServer) allowing for realtime updates. The idea is to work towards a system which supports the basic goals of Openframe, guided by a handful of [pilot use cases](https://github.com/OpenframeProject/Openframe-API/wiki/Pilot-Use-Cases).
+The Openframe controller acts as a process manager for starting, stopping, and transitioning between artworks. It communicates with an [Openframe API Server](https://github.com/OpenframeProject/Openframe-APIServer) server via a REST API, and connects to a [global event system](https://github.com/OpenframeProject/Openframe-PubSubServer) allowing for realtime updates. The idea is to work towards a system which supports the basic goals of Openframe, guided by a handful of [pilot use cases](https://github.com/OpenframeProject/Openframe-API/wiki/Pilot-Use-Cases).
 
 The block diagram below represents a proposed architecture for the Openframe platform. It will continue to evolve as development on the project progresses.
 
-![alt tag](https://raw.github.com/OpenframeProject/Openframe-API/master/docs/img/API Diagram.jpg)
+![alt tag](https://raw.github.com/OpenframeProject/Openframe-APIServer/master/docs/img/API Diagram.jpg)
 
 #### Modules
 
