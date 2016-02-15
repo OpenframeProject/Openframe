@@ -16,7 +16,7 @@
 'use strict';
 
 var inquirer = require('inquirer'),
-    debug = require('debug')('index'),
+    debug = require('debug')('openframe:index'),
     config = require('./src/config'),
     rest = require('./src/rest'),
     frame = require('./src/frame'),
@@ -34,7 +34,6 @@ Promise.all(initializers)
     .then(function() {
         debug(config.ofrc);
         debug(frame.state);
-        // console.log(rest.client);
 
         var auth = config.ofrc.auth || {},
             questions = [];
@@ -77,60 +76,11 @@ Promise.all(initializers)
     });
 
 
-// config.load() // load the config from file
-//     .then(frame.init) // load the frame state from file
-    // .then(function(ofrc) {
-    //     console.log('config loaded...', ofrc);
-    //     var auth = ofrc.auth || {},
-    //         questions = [];
-
-    //     if (!auth.username) {
-    //         // ask for user
-    //         questions.push({
-    //             name: 'username',
-    //             message: 'Enter your Openframe username:'
-    //         });
-    //     }
-
-    //     if (!auth.password) {
-    //         // ask for pass
-    //         questions.push({
-    //             name: 'password',
-    //             type: 'password',
-    //             message: 'Enter your Openframe password:'
-    //         });
-    //     }
-
-    //     if (!ofrc.frame || !ofrc.frame.name) {
-    //         // ask frame name
-    //         questions.push({
-    //             name: 'frame_name',
-    //             message: 'Enter a name for this Frame:'
-    //         });
-    //     }
-
-    //     if (questions.length) {
-    //         inquirer.prompt(questions, function(answers) {
-    //             saveAnswers(answers, ofrc);
-    //         });
-    //     } else {
-    //         init(ofrc);
-    //     }
-    // })
-//     .catch(function(err) {
-//         if (err) {
-//             console.error(err);
-//             return;
-//         }
-//     });
-
-
 /**
  * Save the answers from the prompt to .ofrc file.
  * @param  {Object} answers
  */
 function saveAnswers(answers) {
-    console.log('saveAnswers');
     var ofrc = config.ofrc;
     if (!ofrc.auth) {
         ofrc.auth = {};
@@ -156,11 +106,7 @@ function saveAnswers(answers) {
  * Start up the frame
  */
 function init() {
-    console.log('init');
-
+    debug('Initializing Frame Controller');
     frame_controller.init();
-
-    // // instantiate the frame controller
-    // new FrameController();
 }
 

@@ -1,5 +1,5 @@
 var jsonfile = require('jsonfile'),
-    debug = require('debug')('frame'),
+    debug = require('debug')('openframe:frame'),
 
     rest = require('./rest'),
     pm = require('./plugin-manager'),
@@ -34,13 +34,13 @@ frame.save = function(persist) {
 
     // careful about circular saving... save on the server triggers save locally, triggers save to server, etc...
     rest.client.Frame.Frame_upsert({
-            data: frame.state,
-            id: frame.state.id
-        })
-        .then(function(data) {
-            debug('saved!');
-        })
-        .catch(console.log);
+        data: frame.state,
+        id: frame.state.id
+    })
+    .then(function(data) {
+        debug('saved!');
+    })
+    .catch(debug);
 
     // TODO: save to server
     if (_persist) {
@@ -67,8 +67,8 @@ frame.fetch = function() {
                 // - do we need to remove plugins?
                 // - do we need to update settings?
                 // var newState = data.obj,
-                    // pluginsToAdd = _pluginsToAdd(newState),
-                    // pluginsToRemove = _pluginsToRemove(newState);
+                // pluginsToAdd = _pluginsToAdd(newState),
+                // pluginsToRemove = _pluginsToRemove(newState);
 
                 // if (pluginsToAdd.length) {
                 //     // there are new plugins to install
@@ -88,7 +88,8 @@ frame.fetch = function() {
                         frame.persistStateToFile().then(function() {
                             resolve(frame.state);
                         });
-                    });
+                    })
+                    .catch(debug);
 
 
 
@@ -144,7 +145,7 @@ frame.addFormat = function(format) {
     debug('addFormat');
     frame.state.formats = frame.state.formats || {};
     frame.state.formats[format.name] = format;
-    frame.save();
+    frame.persistStateToFile();
 };
 
 
@@ -161,5 +162,3 @@ function _objDiff(a, b) {
         return b.indexOf(x) < 0;
     });
 }
-
-

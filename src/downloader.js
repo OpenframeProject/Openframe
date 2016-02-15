@@ -9,7 +9,7 @@ var fs = require('fs'),
     url = require('url'),
     http = require('http'),
     exec = require('child_process').exec,
-    debug = require('debug')('downloader');
+    debug = require('debug')('openframe:downloader');
 
 // unused at present
 function _mkdirp(dir) {

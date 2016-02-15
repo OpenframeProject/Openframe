@@ -3,7 +3,7 @@
 var faye = require('faye'),
     config = require('./config'),
     frame = require('./frame'),
-
+    debug = require('debug')('openframe:pubsub'),
     ps = module.exports = {};
 
 ps.client = {};
@@ -18,19 +18,20 @@ ps.init = function(fc) {
     // handlers for pubsub connection events
     ps.client.on('transport:down', function() {
         // the pubsub client is offline
-        console.log('pubsub client dsconnected');
+        debug('pubsub client dsconnected');
     });
 
     ps.client.on('transport:up', function() {
         // the pubsub client is online
-        console.log('pubsub client connected');
+        debug('pubsub client connected');
         ps.client.publish('/frame/connected', frame.state.id);
     });
 
     ps.client.subscribe('/frame/' + frame.state.id + '/updated', function(data) {
-        console.log(data);
-        frame.fetch()
-            .then(fc.changeArtwork);
+        debug('/frame/' + frame.state.id + '/updated');
+
+        // frame updated event handled, hand off frame updating logic to frame controller
+        fc.updateFrame();
     });
 
     return ps.client;

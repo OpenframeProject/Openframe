@@ -8,7 +8,7 @@ The Openframe controller acts as a process manager for starting, stopping, and t
 
 The block diagram below represents a proposed architecture for the Openframe platform. It will continue to evolve as development on the project progresses.
 
-![alt tag](https://raw.github.com/OpenframeProject/Openframe-APIServer/master/docs/img/API Diagram.jpg)
+![alt tag](https://raw.github.com/OpenframeProject/Openframe-API/restify/docs/img/API Diagram.jpg)
 
 #### Modules
 

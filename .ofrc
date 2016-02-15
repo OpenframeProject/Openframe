@@ -1,9 +1,4 @@
 {
-  "auth": {
-    "username": "jon",
-    "password": "asdf",
-    "access_token": "Ce3xzv7DOntd8CiTEHa4XAx2XRFm0XEr82zKBUI8NrFPNRO0cqT0LuSGPSidzlAm"
-  },
   "network": {
     "api_protocol": "http",
     "api_domain": "localhost",
@@ -12,5 +7,5 @@
     "pubsub_domain": "localhost",
     "pubsub_port": "8889"
   },
-  "download_dir": "./artwork/"
+  "auth": {}
 }

@@ -1,4 +1,4 @@
-var debug = require('debug')('plugin_manager'),
+var debug = require('debug')('openframe:plugin_manager'),
     execFile = require('child_process').execFile,
     exec = require('child_process').exec,
 

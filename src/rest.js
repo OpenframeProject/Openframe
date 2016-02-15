@@ -1,7 +1,7 @@
 
 // app dependencies
 var Swagger = require('swagger-client'),
-    debug = require('debug')('rest'),
+    debug = require('debug')('openframe:rest'),
     config = require('./config'),
     // --> EXPORT
     rest = module.exports = {};
@@ -18,7 +18,7 @@ rest.init = function() {
             usePromise: true
         }).then(function(client) {
             // To see all available methods:
-            // console.log(client);
+            // debug(client);
 
             rest.client = client;
             resolve(client);

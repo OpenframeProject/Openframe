@@ -6,7 +6,7 @@
 var util = require('util'),
     url = require('url'),
     path = require('path'),
-    debug = require('debug')('frame_controller'),
+    debug = require('debug')('openframe:frame_controller'),
     EventEmitter = require('events').EventEmitter,
     Swagger = require('swagger-client'),
 
@@ -16,6 +16,7 @@ var util = require('util'),
     pm = require('./plugin-manager'),
     config = require('./config'),
     frame = require('./frame'),
+    user = require('./user'),
     rest = require('./rest'),
 
     // --> EXPORT
@@ -49,7 +50,7 @@ fc.init = function() {
  * Called when the frame has finished initializing.
  */
 fc.ready = function() {
-    debug('ready', frame.state);
+    debug('ready');
 
     if (frame.state && frame.state._current_artwork) {
         fc.changeArtwork();
@@ -58,14 +59,14 @@ fc.ready = function() {
 
 
 /**
- * Authenticate to the API server using the supplied user/pass.
+ * Authenticate with the API server using the supplied user/pass.
  *
  * @return {Promise} A promise resolving with the logged-in user's ID
  */
 fc.login = function() {
     debug('login');
 
-    var creds = config.ofrc.auth;
+    var creds = user.state;
     return new Promise(function(resolve, reject) {
         rest.client.OpenframeUser.OpenframeUser_login({
             credentials: creds
@@ -76,8 +77,14 @@ fc.login = function() {
             }
             resolve(resp.obj.userId);
         }).catch(function(err) {
-            console.log('err', err);
-            reject(err);
+            // login failed...
+            debug('Login failed. Please try again.');
+            user.state = {};
+            user
+                .save()
+                .then(function() {
+                    reject(err);
+                });
         });
     });
 };
@@ -112,7 +119,7 @@ fc.connect = function(userId) {
                 fc.registerNewFrame(userId)
                     .then(readyToConnect)
                     .catch(function(err) {
-                        console.log(err);
+                        debug(err);
                         reject(err);
                     });
             });
@@ -160,7 +167,7 @@ fc.registerNewFrame = function(userId) {
  * Frame's _current_artwork.
  */
 fc.changeArtwork = function() {
-    debug('changeArtwork');
+    debug('changeArtwork', fc.current_artwork, frame.state._current_artwork);
 
     var old_artwork = fc.current_artwork || undefined,
         new_artwork = frame.state._current_artwork,
@@ -169,34 +176,67 @@ fc.changeArtwork = function() {
         tokens = {},
         parsed, file_name;
 
-    function swapArt() {
-        debug('swapArt');
-        if (old_artwork) {
-            _endArt(old_format.end_command, tokens).then(function() {
+    return new Promise(function(resolve, reject) {
+        // old artwork is new artwork, don't update.
+        if (old_artwork && old_artwork.id === new_artwork.id) {
+            debug('new artwork same as current', old_artwork.id, new_artwork.id);
+            return reject();
+        }
+
+        function swapArt() {
+            debug('swapArt');
+            if (old_artwork) {
+                _endArt(old_format.end_command, tokens)
+                    .then(function() {
+                        _startArt(new_format.start_command, tokens);
+                        fc.current_artwork = new_artwork;
+                        resolve();
+                    })
+                    .catch(reject);
+            } else {
                 _startArt(new_format.start_command, tokens);
                 fc.current_artwork = new_artwork;
-            });
-        } else {
-            _startArt(new_format.start_command, tokens);
-            fc.current_artwork = new_artwork;
+                resolve();
+            }
         }
-    }
 
-    if (new_format.download) {
-        // this artwork needs to be downloaded
-        parsed = url.parse(new_artwork.url);
-        file_name = path.basename(parsed.pathname);
+        if (new_format.download) {
+            debug('download');
+            // this artwork needs to be downloaded
+            parsed = url.parse(new_artwork.url);
+            file_name = path.basename(parsed.pathname);
 
-        downloader.downloadFile(new_artwork.url, new_artwork._id + file_name)
-            .then(function(file) {
-                tokens['$filepath'] = file.path;
-                swapArt();
-            });
-    } else {
-        // this artwork can be displayed via the url
-        tokens['$url'] = new_artwork.url;
-        swapArt();
-    }
+            downloader.downloadFile(new_artwork.url, new_artwork.id + file_name)
+                .then(function(file) {
+                    tokens['$filepath'] = file.path;
+                    swapArt();
+                })
+                .catch(reject);
+        } else {
+            debug('DO NOT download');
+            // this artwork can be displayed via the url
+            tokens['$url'] = new_artwork.url;
+            swapArt();
+        }
+
+    });
+};
+
+fc.updateFrame = function() {
+    frame.fetch()
+        .then(function(new_state) {
+            // TODO: we could add logic here to only update necessary items...
+            // For now, changeArtwork should exit if old and new artwork are the same
+            fc.changeArtwork()
+                .then(function() {
+                    // success changing artwork
+                })
+                .catch(function() {
+                    // error changing artwork, reset frame.state._current_artwork to true current
+                    frame.state._current_artwork = fc.current_artwork;
+                    frame.persistStateToFile();
+                });
+        });
 };
 
 /**
@@ -209,7 +249,9 @@ fc.pluginApi = {
     // give the plugin access to the global pubsub
     getPubsub: function() {
         return fc.pubsub;
-    }
+    },
+    // access to the Swagger rest client
+    rest: rest.client
 };
 
 /**

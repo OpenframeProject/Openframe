@@ -5,26 +5,31 @@
   "main": "index.js",
   "scripts": {
     "start": "node .",
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags"
   },
   "bin": {
-    "openframe": "./cli.js"
+    "openframe": "./bin/cli.js"
   },
   "preferGlobal": true,
   "author": {
     "name": "Jonathan Wohl",
     "url": "http://jonathanwohl.com"
   },
-  "contributors": [{
-    "name": "Jonathan Wohl",
-    "url": "http://jonathanwohl.com"
-  },{
-    "name": "Ishac Bertran",
-    "url": "http://ishacbertran.com"
-  }],
+  "contributors": [
+    {
+      "name": "Jonathan Wohl",
+      "url": "http://jonathanwohl.com"
+    },
+    {
+      "name": "Ishac Bertran",
+      "url": "http://ishacbertran.com"
+    }
+  ],
   "license": "GPL-3.0",
   "dependencies": {
     "commander": "^2.8.1",
+    "debug": "^2.2.0",
     "faye": "^1.1.2",
     "inquirer": "^0.11.1",
     "jsonfile": "^2.2.1",
@@ -39,6 +44,9 @@
     "npm": "^3.5.3",
     "sinon": "^1.17.2"
   },
+  "keywords": [
+    "openframe"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/OpenframeProject/Openframe"

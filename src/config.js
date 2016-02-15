@@ -3,7 +3,7 @@
  */
 
 var jsonfile = require('jsonfile'),
-    debug = require('debug')('config'),
+    debug = require('debug')('openframe:config'),
     ofrc_file = './.ofrc',
 
     config = module.exports = {};
@@ -13,7 +13,7 @@ var jsonfile = require('jsonfile'),
  */
 /*
 function getPlatform() {
-    console.log(process.platform);
+    debug(process.platform);
 
     if (/^linux/.test(process.platform)) {
         return 'linux';
