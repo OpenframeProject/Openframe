@@ -7,7 +7,7 @@
 // spawn would be necessary if we wanted to exchange data with child process (maybe for live coding?)
 var spawn = require('child_process').spawn,
     exec = require('child_process').exec,
-
+    debug = require('debug')('process_manager'),
     processes = {},
     processStack = [];
 
@@ -17,7 +17,7 @@ var spawn = require('child_process').spawn,
  * @param  {String} command The command to execute.
  */
 function startProcess(command) {
-    // console.log('startProcess: ', command);
+    // debug('startProcess: ', command);
     var command_ary = command.split(' '),
         command_bin = command_ary[0],
         command_args = command_ary.slice(1);
@@ -40,13 +40,13 @@ function startProcess(command) {
  * @param  {Number} pid The process id of the process to kill.
  */
 function killProcess(pid) {
-    // console.log('killProcess: ', pid);
+    // debug('killProcess: ', pid);
     // processes[pid].kill();
     // _killAllDescendents(pid);
     try {
         process.kill(-pid);
     } catch (e) {
-        console.log(e);
+        debug(e);
     }
     delete processes[pid];
     var stack_idx = processStack.indexOf(pid);
@@ -59,7 +59,7 @@ function killProcess(pid) {
  * Kill the currently running process (top of the stack)
  */
 function killCurrentProcess() {
-    // console.log('killCurrentProcess');
+    // debug('killCurrentProcess');
     var cur_proc = getCurrentProcess();
     if (cur_proc) {
         killProcess(cur_proc);
@@ -85,18 +85,18 @@ function getCurrentProcess() {
 function _setupChildProcessEvents(child) {
     if (child.stdout) {
         child.stdout.on('data', function(data) {
-            console.log('stdout: ' + data);
+            debug('stdout: ' + data);
         });
     }
 
     if (child.stderr) {
         child.stderr.on('data', function(data) {
-            console.log('stdout: ' + data);
+            debug('stdout: ' + data);
         });
     }
 
     child.on('close', function(code) {
-        console.log('child ' + child.pid + ' closing code: ' + code);
+        debug('child ' + child.pid + ' closing code: ' + code);
     });
 }
 
