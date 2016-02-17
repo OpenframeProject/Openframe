@@ -4,7 +4,7 @@
 
 var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:config'),
-    ofrc_file = './.ofrc',
+    ofrc_file = '../.ofrc',
 
     config = module.exports = {};
 /**
