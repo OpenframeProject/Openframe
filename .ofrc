@@ -6,6 +6,5 @@
     "pubsub_protocol": "http",
     "pubsub_domain": "localhost",
     "pubsub_port": "8889"
-  },
-  "auth": {}
+  }
 }
