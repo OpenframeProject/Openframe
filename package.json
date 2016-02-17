@@ -7,7 +7,7 @@
     "start": "node .",
     "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
-    "install": "sh ./install.sh"
+    "install": "./install.sh"
   },
   "bin": {
     "openframe": "./bin/cli.js"
@@ -34,12 +34,11 @@
     "faye": "^1.1.2",
     "inquirer": "^0.11.1",
     "jsonfile": "^2.2.1",
-    "openframe-glslviewer": "git+https://git@github.com/OpenframeProject/Openframe-glslViewer.git",
-    "openframe-image": "git+https://git@github.com/OpenframeProject/Openframe-Image.git",
+    "openframe-glslviewer": "^0.1.1",
+    "openframe-image": "^0.1.1",
     "swagger-client": "^2.1.9"
   },
   "devDependencies": {
-    "debug": "^2.2.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
     "npm": "^3.5.3",
