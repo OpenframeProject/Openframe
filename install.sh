@@ -9,7 +9,8 @@ os=$(uname)
 arq=$(uname -m)
 
 # copy default .ofrc to user dir
-mkdir -p ~/.openframe/artwork
+mkdir ~/.openframe
+mkdir ~/.openframe/artwork
 chmod -R +wr ~/.openframe
 cp .ofrc ~/.openframe/.ofrc
 
