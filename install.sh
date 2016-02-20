@@ -8,9 +8,11 @@ echo "Openframe -- install.sh"
 os=$(uname)
 arq=$(uname -m)
 
-# copy default .ofrc to user dir
-sudo mkdir -p ~/.openframe/artwork
-sudo chmod -R +wr ~/.openframe
+# # copy default .ofrc to user dir
+# echo `env`
+
+mkdir -p ~/.openframe/artwork
+# chmod -R +wr ~/.openframe
 cp .ofrc ~/.openframe/.ofrc
 
 if [ $os == "Linux" ]; then
