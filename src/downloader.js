@@ -6,10 +6,11 @@
 
 // Dependencies
 var fs = require('fs'),
-    url = require('url'),
     http = require('http'),
     exec = require('child_process').exec,
-    debug = require('debug')('openframe:downloader');
+    debug = require('debug')('openframe:downloader'),
+    config = require('./config'),
+    artworkDir = config.getOpenframeDir() + '/artwork';
 
 // unused at present
 function _mkdirp(dir) {
@@ -33,7 +34,7 @@ function downloadFile(file_url, file_output_name, cb) {
 
     return new Promise(function(resolve, reject) {
         var file_name = file_output_name,
-            file_path = './artwork/' + file_name,
+            file_path = artworkDir + '/' + file_name,
             file = fs.createWriteStream(file_path);
 
         http.get(file_url, function(res) {

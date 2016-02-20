@@ -29,7 +29,11 @@ config.getUserHome = function() {
     return process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 };
 
-ofrc_file = config.getUserHome() + '/.ofrc';
+config.getOpenframeDir = function() {
+    return config.getUserHome + '/.openframe';
+};
+
+ofrc_file = config.getUserHome() + '/.openframe/.ofrc';
 
 config.ofrc = {};
 

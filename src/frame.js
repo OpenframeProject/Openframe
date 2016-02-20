@@ -3,7 +3,7 @@ var jsonfile = require('jsonfile'),
 
     rest = require('./rest'),
     config = require('./config'),
-    frame_file = config.getUserHome() + '/.of_frame.json',
+    frame_file = config.getOpenframeDir() + '/frame.json',
 
     frame = module.exports = {};
 

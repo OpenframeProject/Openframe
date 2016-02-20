@@ -9,7 +9,8 @@ os=$(uname)
 arq=$(uname -m)
 
 # copy default .ofrc to user dir
-cp .ofrc ~/.ofrc
+mkdir -p ~/.openframe/artwork
+cp .ofrc ~/.openframe/.ofrc
 
 if [ $os == "Linux" ]; then
 

@@ -5,7 +5,7 @@
 var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:user'),
     config = require('./config'),
-    user_file = config.getUserHome() + '/.of_user.json',
+    user_file = config.getOpenframeDir() + '/.openframe/user.json',
 
     user = module.exports = {};
 
