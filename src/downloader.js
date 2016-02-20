@@ -30,28 +30,21 @@ function _mkdirp(dir) {
  * @param  {String}   file_output_name
  */
 function downloadFile(file_url, file_output_name, cb) {
-    var options = {
-        host: url.parse(file_url).host,
-        port: 80,
-        path: url.parse(file_url).pathname
-    };
 
     return new Promise(function(resolve, reject) {
         var file_name = file_output_name,
             file_path = './artwork/' + file_name,
             file = fs.createWriteStream(file_path);
 
-        http.get(options, function(res) {
-            res.on('data', function(data) {
-                file.write(data);
-            }).on('end', () => {
-                debug(file_name + ' downloaded to ./artwork/');
-                file.end();
-                resolve(file);
-                if (cb) {
-                    cb(file);
-                }
-            }).on('error', (e) => {
+        http.get(file_url, function(res) {
+            res.pipe(file);
+            file.on('finish', function() {
+                file.close(function() {
+                    if (cb) cb();
+                    resolve(file);
+                });  // close() is async, call cb after close completes.
+            });
+            res.on('error', (e) => {
                 debug(`Got error: ${e.message}`);
                 reject(e);
             });

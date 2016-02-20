@@ -225,17 +225,28 @@ fc.changeArtwork = function() {
 fc.updateFrame = function() {
     frame.fetch()
         .then(function(new_state) {
-            // TODO: we could add logic here to only update necessary items...
-            // For now, changeArtwork should exit if old and new artwork are the same
-            fc.changeArtwork()
+            pm.installPlugins(new_state.plugins)
                 .then(function() {
-                    // success changing artwork
+                    debug('-----> plugins installed');
+                    pm.initPlugins(frame.state.plugins, fc.pluginApi)
+                        .then(function() {
+                            // once we're done updating/initializing the frame plugins, call change artwork
+                            // TODO: we could add logic here to only update necessary items...
+                            // For now, changeArtwork should exit if old and new artwork are the same
+                            // TODO: DRY with else below
+                            if (frame.state._current_artwork) {
+                                fc.changeArtwork()
+                                    .then(function() {
+                                        // success changing artwork
+                                    })
+                                    .catch(function() {
+                                        // error changing artwork, reset frame.state._current_artwork to true current
+                                        frame.state._current_artwork = fc.current_artwork;
+                                    });
+                            }
+                        });
                 })
-                .catch(function() {
-                    // error changing artwork, reset frame.state._current_artwork to true current
-                    frame.state._current_artwork = fc.current_artwork;
-                    frame.persistStateToFile();
-                });
+                .catch(debug);
         });
 };
 

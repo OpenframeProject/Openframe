@@ -2,7 +2,6 @@ var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:frame'),
 
     rest = require('./rest'),
-    pm = require('./plugin-manager'),
 
     frame_file = './.frame.json',
 
@@ -62,35 +61,10 @@ frame.fetch = function() {
             }).then(function(data) {
                 debug('Frame_findById - found', data);
 
-                // - check diff between our current _state and incoming state
-                // - do we need to add plugins?
-                // - do we need to remove plugins?
-                // - do we need to update settings?
-                // var newState = data.obj,
-                // pluginsToAdd = _pluginsToAdd(newState),
-                // pluginsToRemove = _pluginsToRemove(newState);
-
-                // if (pluginsToAdd.length) {
-                //     // there are new plugins to install
-                //     debug('----> ADD PLUGINS', pluginsToAdd);
-                // }
-
-                // if (pluginsToRemove.length) {
-                //     // there are plugins to remove
-                //     debug('----> REMOVE PLUGINS', pluginsToRemove);
-                // }
-
-                pm.installPlugins(data.obj.plugins)
-                    .then(function() {
-                        debug('-----> plugins installed');
-                        // once we're done update the frame plugins / settings, persist the _state
-                        frame.state = data.obj;
-                        frame.persistStateToFile().then(function() {
-                            resolve(frame.state);
-                        });
-                    })
-                    .catch(debug);
-
+                frame.state = data.obj;
+                frame.persistStateToFile().then(function() {
+                    resolve(frame.state);
+                });
 
 
             }).catch(reject);
@@ -147,18 +121,3 @@ frame.addFormat = function(format) {
     frame.state.formats[format.name] = format;
     frame.persistStateToFile();
 };
-
-
-function _pluginsToAdd(_new_state) {
-    return _objDiff(_new_state, frame.state);
-}
-
-function _pluginsToRemove(_new_state) {
-    return _objDiff(frame.state, _new_state);
-}
-
-function _objDiff(a, b) {
-    return a.filter(function(x) {
-        return b.indexOf(x) < 0;
-    });
-}
