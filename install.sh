@@ -8,6 +8,9 @@ echo "Openframe -- install.sh"
 os=$(uname)
 arq=$(uname -m)
 
+# copy default .ofrc to user dir
+cp .ofrc ~/.ofrc
+
 if [ $os == "Linux" ]; then
 
     # on Debian Linux distributions

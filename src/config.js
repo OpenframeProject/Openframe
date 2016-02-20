@@ -4,7 +4,7 @@
 
 var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:config'),
-    ofrc_file = '../.ofrc',
+    ofrc_file,
 
     config = module.exports = {};
 /**
@@ -25,6 +25,11 @@ function getPlatform() {
 }
 */
 
+config.getUserHome = function() {
+    return process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+};
+
+ofrc_file = config.getUserHome() + '/.ofrc';
 
 config.ofrc = {};
 
