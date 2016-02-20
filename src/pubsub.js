@@ -32,6 +32,7 @@ ps.init = function(fc) {
 
         // frame updated event handled, hand off frame updating logic to frame controller
         fc.updateFrame();
+        // frame.fetch();
     });
 
     return ps.client;

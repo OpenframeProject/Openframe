@@ -20,7 +20,7 @@ pm.init = function() {
 /**
  * Install plugins.
  *
- * TODO: since we're just running npm cli via exec(), and reason not to install
+ * TODO: since we're just running npm cli via exec(), any reason not to install
  * all plugins at once instead of one at a time?
  *
  * @param {object} plugins A hash of plugins to install
@@ -37,7 +37,33 @@ pm.installPlugins = function(plugins, force) {
     // add each plugin to package.json
     for (key in plugins) {
         if (plugins.hasOwnProperty(key)) {
-            promises.push(_installPlugin(key, plugins[key], _force));
+            promises.push(pm.installPlugin(key, plugins[key], _force));
+        }
+    }
+
+    return Promise.all(promises);
+};
+
+/**
+ * Remove plugins.
+ *
+ * TODO: since we're just running npm cli via exec(), any reason not to remove
+ * all plugins at once instead of one at a time?
+ *
+ * @param {object} plugins A hash of plugins to remove
+ * @param {Boolean} force Install the plugin even if it's already installed (skip the check)
+ * @return {Promise} A promise resolved with all of the npmi results for each plugin
+ */
+pm.removePlugins = function(plugins) {
+    debug('removePlugins');
+
+    var promises = [],
+        key;
+
+    // add each plugin to package.json
+    for (key in plugins) {
+        if (plugins.hasOwnProperty(key)) {
+            promises.push(pm.removePlugin(key, plugins[key]));
         }
     }
 
@@ -97,8 +123,6 @@ pm.initPlugins = function(plugins, ofPluginApi) {
  *
  * Uses machine's npm as a child_process so that we don't have to depend on the npm package.
  *
- * TODO: don't re-install plugins that are already present
- *
  * @private
  *
  * @param  {String} package_name NPM package name
@@ -106,10 +130,13 @@ pm.initPlugins = function(plugins, ofPluginApi) {
  * @param {Boolean} force Install the plugin even if it's already installed (skip the check)
  * @return {Promise} A promise resolving with the package_name
  */
-function _installPlugin(package_name, version, force) {
+pm.installPlugin = function(package_name, version, force) {
     debug('installPlugin', package_name, version);
     var cmd = 'npm install ' + package_name;
-    if (version) {
+    if (force === undefined && version === true) {
+        force = true;
+    }
+    if (version && version !== true) {
         cmd += '@'+version;
     }
     cmd += ' --save';
@@ -119,7 +146,7 @@ function _installPlugin(package_name, version, force) {
                 resolve(package_name);
             });
         } else {
-            _checkPlugin(package_name, version).then(function(is_installed) {
+            pm.checkPlugin(package_name, version).then(function(is_installed) {
                 if (!is_installed) {
                     // only install if it's not already installed.
                     _runNpmCommand(cmd).then(function() {
@@ -135,7 +162,7 @@ function _installPlugin(package_name, version, force) {
             });
         }
     });
-}
+};
 
 /**
  * Removes a single plugin by removing it from the npm package.
@@ -144,7 +171,7 @@ function _installPlugin(package_name, version, force) {
  * @param  {String} version      NPM package version (or repo URL for plugins not in NPM)
  * @return {Promise} A promise resolving with the package_name
  */
-function _removePlugin(package_name, version) {
+pm.removePlugin = function(package_name, version) {
     debug('removePlugin', package_name, version);
     var cmd = 'npm remove ' + package_name;
     if (version) {
@@ -156,7 +183,7 @@ function _removePlugin(package_name, version) {
             resolve(package_name);
         });
     });
-}
+};
 
 /**
  * Check whether a plugin is already installed.
@@ -165,7 +192,7 @@ function _removePlugin(package_name, version) {
  * @param  {String} version      NPM package version (or repo URL for plugins not in NPM)
  * @return {Promise} A promise resolving with either true (plugin installed) or false (plugin not installed)
  */
-function _checkPlugin(package_name, version) {
+pm.checkPlugin = function(package_name, version) {
     debug('checkPlugin', package_name, version);
     var cmd = 'npm list ' + package_name;
     if (version) {
@@ -181,7 +208,7 @@ function _checkPlugin(package_name, version) {
                 resolve(false);
             });
     });
-}
+};
 
 /**
  * Initialize a single plugin.

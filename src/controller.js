@@ -3,6 +3,7 @@
  */
 
 // app dependencies
+const assert = require('assert');
 var util = require('util'),
     url = require('url'),
     path = require('path'),
@@ -130,7 +131,10 @@ fc.connect = function(userId) {
  * Register this as a new frame for user [userId]. This creates a new
  * Frame object on the server via the REST api.
  *
- * TODO: should this be on the frame model? a create method?
+ * On successful frame creation, this sets the frame.state and persists it,
+ * then installs the plugins listed on the frame (i.e. the default plugins).
+ *
+ * TODO: should this be on the frame module? a create method?
  *
  * @param  {String} userId
  * @return {Promise} A promise resolving with the newly created Frame object
@@ -171,7 +175,7 @@ fc.changeArtwork = function() {
 
     var old_artwork = fc.current_artwork || undefined,
         new_artwork = frame.state._current_artwork,
-        old_format = old_artwork && frame.state.formats[old_artwork.format],
+        old_format = old_artwork && old_artwork.format ? frame.state.formats[old_artwork.format] : null,
         new_format = frame.state.formats[new_artwork.format],
         tokens = {},
         parsed, file_name;
@@ -186,15 +190,15 @@ fc.changeArtwork = function() {
         function swapArt() {
             debug('swapArt');
             if (old_artwork) {
-                _endArt(old_format.end_command, tokens)
+                fc.endArt(old_format.end_command, tokens)
                     .then(function() {
-                        _startArt(new_format.start_command, tokens);
+                        fc.startArt(new_format.start_command, tokens);
                         fc.current_artwork = new_artwork;
                         resolve();
                     })
                     .catch(reject);
             } else {
-                _startArt(new_format.start_command, tokens);
+                fc.startArt(new_format.start_command, tokens);
                 fc.current_artwork = new_artwork;
                 resolve();
             }
@@ -225,17 +229,28 @@ fc.changeArtwork = function() {
 fc.updateFrame = function() {
     frame.fetch()
         .then(function(new_state) {
-            // TODO: we could add logic here to only update necessary items...
-            // For now, changeArtwork should exit if old and new artwork are the same
-            fc.changeArtwork()
+            pm.installPlugins(new_state.plugins)
                 .then(function() {
-                    // success changing artwork
+                    debug('-----> plugins installed');
+                    pm.initPlugins(frame.state.plugins, fc.pluginApi)
+                        .then(function() {
+                            // once we're done updating/initializing the frame plugins, call change artwork
+                            // TODO: we could add logic here to only update necessary items...
+                            // For now, changeArtwork should exit if old and new artwork are the same
+                            // TODO: DRY with else below
+                            if (frame.state._current_artwork) {
+                                fc.changeArtwork()
+                                    .then(function() {
+                                        // success changing artwork
+                                    })
+                                    .catch(function() {
+                                        // error changing artwork, reset frame.state._current_artwork to true current
+                                        frame.state._current_artwork = fc.current_artwork;
+                                    });
+                            }
+                        });
                 })
-                .catch(function() {
-                    // error changing artwork, reset frame.state._current_artwork to true current
-                    frame.state._current_artwork = fc.current_artwork;
-                    frame.persistStateToFile();
-                });
+                .catch(debug);
         });
 };
 
@@ -246,11 +261,21 @@ fc.updateFrame = function() {
 fc.pluginApi = {
     // let the plugin add a format to the frame
     addFormat: frame.addFormat,
+
     // give the plugin access to the global pubsub
     getPubsub: function() {
         return fc.pubsub;
     },
+
+    // get the current state of the frame,
+    // as most recently fetched from the server
+    getFrameState: function() {
+        return frame.state;
+    },
+
     // access to the Swagger rest client
+    // TODO: either document this more thoroughly, or
+    // better yet provide a custom and more useful rest client
     rest: rest.client
 };
 
@@ -260,9 +285,9 @@ fc.pluginApi = {
  * @param  {object} tokens
  * @return {Promise}
  */
-function _startArt(_command, tokens) {
-    debug('startArt');
-    var command = _replaceTokens(_command, tokens);
+fc.startArt = function(_command, tokens) {
+    var command = fc.replaceTokens(_command, tokens);
+    debug('startArt', command);
 
     return new Promise(function(resolve, reject) {
         // TODO: proc_man.startProcess doesn't return Promise
@@ -270,7 +295,7 @@ function _startArt(_command, tokens) {
         proc_man.startProcess(command);
         resolve();
     });
-}
+};
 
 /**
  * End a playing artwork.
@@ -278,9 +303,9 @@ function _startArt(_command, tokens) {
  * @param  {object} tokens
  * @return {Promise} Resolves when command is complete.
  */
-function _endArt(_command, tokens) {
+fc.endArt = function(_command, tokens) {
     debug('endArt');
-    var command = _replaceTokens(_command, tokens);
+    var command = fc.replaceTokens(_command, tokens);
     return new Promise(function(resolve, reject) {
         proc_man.exec(command, function(err) {
             if (err) {
@@ -289,7 +314,7 @@ function _endArt(_command, tokens) {
             resolve();
         });
     });
-}
+};
 
 /**
  * Replace placeholder tokens in a string.
@@ -300,7 +325,7 @@ function _endArt(_command, tokens) {
  * @param  {object} tokens
  * @return {string} The string with tokens replaced.
  */
-function _replaceTokens(_str, tokens) {
+fc.replaceTokens = function(_str, tokens) {
     var str = _str,
         key;
     for (key in tokens) {
@@ -310,4 +335,4 @@ function _replaceTokens(_str, tokens) {
         }
     }
     return str;
-}
+};

@@ -1,4 +1,5 @@
-var jsonfile = require('jsonfile'),
+var diff = require('deep-diff').diff,
+    jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:frame'),
 
     rest = require('./rest'),
@@ -8,7 +9,10 @@ var jsonfile = require('jsonfile'),
 
     frame = module.exports = {};
 
+// current state of the frame
 frame.state = {};
+// when the frame is updating, the incoming state from the server
+frame.incoming_state = {};
 
 frame.load = function() {
     debug('load');
@@ -60,43 +64,111 @@ frame.fetch = function() {
             rest.client.Frame.Frame_findById({
                 id: frame.state.id
             }).then(function(data) {
-                debug('Frame_findById - found', data);
-
-                // - check diff between our current _state and incoming state
-                // - do we need to add plugins?
-                // - do we need to remove plugins?
-                // - do we need to update settings?
-                // var newState = data.obj,
-                // pluginsToAdd = _pluginsToAdd(newState),
-                // pluginsToRemove = _pluginsToRemove(newState);
-
-                // if (pluginsToAdd.length) {
-                //     // there are new plugins to install
-                //     debug('----> ADD PLUGINS', pluginsToAdd);
-                // }
-
-                // if (pluginsToRemove.length) {
-                //     // there are plugins to remove
-                //     debug('----> REMOVE PLUGINS', pluginsToRemove);
-                // }
-
-                pm.installPlugins(data.obj.plugins)
-                    .then(function() {
-                        debug('-----> plugins installed');
-                        // once we're done update the frame plugins / settings, persist the _state
-                        frame.state = data.obj;
-                        frame.persistStateToFile().then(function() {
-                            resolve(frame.state);
-                        });
-                    })
-                    .catch(debug);
+                debug('Frame_findById - found');
 
 
+                // frame.incoming_state = data.obj;
 
+                // frame.updatePlugins()
+                //     .then(frame.updateArtwork);
+
+                // frame.updateSettings()
+                //     .then(updatePlugins)
+                //     .then(updateArtwork);
+
+
+                // save updated frame to local disk
+                frame.state = data.obj;
+                frame.persistStateToFile().then(function() {
+                    resolve(frame.state);
+                });
             }).catch(reject);
         } else {
             reject();
         }
+    });
+};
+
+frame.updateSettings = function() {
+    return new Promise(function(resolve, reject) {
+        var differences = diff(frame.state.settings, frame.incoming_state.settings);
+
+        if (!differences) return resolve();
+
+        if (differences.length) {
+            differences.forEach(function(difference) {
+                if (difference.kind === 'D') {
+                    // setting removed
+                }
+                if (difference.kind === 'E') {
+                    // setting edited
+                }
+                if (difference.kind === 'N') {
+                    // setting added
+                }
+            });
+        }
+    });
+};
+
+/**
+ * Calculate the diff between the current frame's plugins and previous plugins
+ * @return {Promise}
+ */
+frame.updatePlugins = function() {
+    return new Promise(function(resolve, reject) {
+        var differences = diff(frame.state.plugins, frame.incoming_state.plugins),
+            installPromise,
+            removePromise,
+            pluginPromises = [],
+            toRemove = {},
+            toInstall = {};
+
+        // no differences, nothing to update
+        if (!differences) {
+            return resolve();
+        }
+
+        // iterate through differences, build hashes of those to install and those to remove
+        differences.forEach(function(difference) {
+            if (difference.kind === 'D') {
+                // plugin removed
+                toRemove[difference.path[0]] = difference.lhs;
+            }
+            if (difference.kind === 'E' || difference.kind === 'N') {
+                // plugin edited or added (N for New), either way install
+                toInstall[difference.path[0]] = difference.rhs;
+            }
+        });
+
+        pluginPromises.push(pm.installPlugins(toInstall));
+        pluginPromises.push(pm.removePlugins(toRemove));
+
+        Promise.all(pluginPromises).then(resolve).catch(reject);
+
+    });
+};
+
+/**
+ * Calculate the diff between currently displayed artwork and incoming artwork
+ * @return {Promise}
+ */
+frame.updateArtwork = function() {
+    return new Promise(function(resolve, reject) {
+        var differences = diff(frame.state._current_artwork, frame.incoming_state._current_artwork);
+
+        // no differences, nothing to update
+        if (!differences) {
+            return resolve();
+        }
+
+        // there are differences, continue updating
+        if (frame.state._current_artwork) {
+            // frame is currently displaying something
+        } else {
+            //
+        }
+
     });
 };
 
@@ -118,6 +190,19 @@ frame.persistStateToFile = function() {
         });
     });
 };
+
+/**
+ * Synchronously persist the local frame state to disk
+ * @return {Promise}
+ */
+frame.persistStateToFileSync = function() {
+    debug('persistStateToFileSync');
+    jsonfile.writeFileSync(frame_file, frame.state, {
+        spaces: 2
+    });
+};
+
+
 
 /**
  * Laod the local frame state
@@ -147,18 +232,3 @@ frame.addFormat = function(format) {
     frame.state.formats[format.name] = format;
     frame.persistStateToFile();
 };
-
-
-function _pluginsToAdd(_new_state) {
-    return _objDiff(_new_state, frame.state);
-}
-
-function _pluginsToRemove(_new_state) {
-    return _objDiff(frame.state, _new_state);
-}
-
-function _objDiff(a, b) {
-    return a.filter(function(x) {
-        return b.indexOf(x) < 0;
-    });
-}
