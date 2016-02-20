@@ -43,12 +43,15 @@ function downloadFile(file_url, file_output_name, cb) {
                 file.close(function() {
                     if (cb) cb();
                     resolve(file);
-                });  // close() is async, call cb after close completes.
+                }); // close() is async, call cb after close completes.
             });
             res.on('error', (e) => {
                 debug(`Got error: ${e.message}`);
                 reject(e);
             });
+        }).on('error', (e) => {
+            debug(`Got error: ${e.message}`);
+            reject(e);
         });
     });
 

@@ -5,7 +5,7 @@
 var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:user'),
     config = require('./config'),
-    user_file = config.getOpenframeDir() + '/.openframe/user.json',
+    user_file = config.getOpenframeDir() + '/user.json',
 
     user = module.exports = {};
 
@@ -16,7 +16,7 @@ user.state = {};
  * Save the current state to disk
  */
 user.save = function() {
-    debug('save');
+    debug('save', user_file);
     var self = this,
         p = new Promise(function(resolve, reject) {
             jsonfile.writeFile(user_file, self.state, {
