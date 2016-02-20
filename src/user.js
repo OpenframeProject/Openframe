@@ -4,7 +4,8 @@
 
 var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:user'),
-    user_file = './.user.json',
+    config = require('./config'),
+    user_file = config.getUserHome() + '/.of_user.json',
 
     user = module.exports = {};
 
@@ -41,7 +42,7 @@ user.load = function() {
         p = new Promise(function(resolve, reject) {
             jsonfile.readFile(user_file, function(err, state) {
                 // if error reading from file, just return the current state
-                user.state = state;
+                user.state = state || {};
                 resolve(user.state);
             });
         });

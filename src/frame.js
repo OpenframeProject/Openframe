@@ -2,8 +2,8 @@ var jsonfile = require('jsonfile'),
     debug = require('debug')('openframe:frame'),
 
     rest = require('./rest'),
-
-    frame_file = './.frame.json',
+    config = require('./config'),
+    frame_file = config.getUserHome() + '/.of_frame.json',
 
     frame = module.exports = {};
 
