@@ -33,7 +33,7 @@ config.getOpenframeDir = function() {
     return config.getUserHome() + '/.openframe';
 };
 
-ofrc_file = config.getUserHome() + '/.openframe/.ofrc';
+ofrc_file = config.getOpenframeDir() + '/.ofrc';
 
 config.ofrc = {};
 

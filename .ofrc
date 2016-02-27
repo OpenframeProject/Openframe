@@ -2,9 +2,6 @@
   "network": {
     "api_protocol": "http",
     "api_domain": "openframe.io",
-    "api_port": "8888",
-    "pubsub_protocol": "http",
-    "pubsub_domain": "openframe.io",
-    "pubsub_port": "8889"
+    "api_port": "8888"
   }
 }

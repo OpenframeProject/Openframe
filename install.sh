@@ -12,7 +12,6 @@ arq=$(uname -m)
 # echo `env`
 
 mkdir -p ~/.openframe/artwork
-# chmod -R +wr ~/.openframe
 cp .ofrc ~/.openframe/.ofrc
 
 if [ $os == "Linux" ]; then

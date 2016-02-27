@@ -9,8 +9,7 @@ var fs = require('fs'),
     http = require('http'),
     exec = require('child_process').exec,
     debug = require('debug')('openframe:downloader'),
-    config = require('./config'),
-    artworkDir = config.getOpenframeDir() + '/artwork';
+    artworkDir = '/tmp';
 
 // unused at present
 function _mkdirp(dir) {
