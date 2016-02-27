@@ -10,8 +10,7 @@ var faye = require('faye'),
 ps.client = {};
 
 ps.init = function(fc) {
-    var network = config.ofrc.network,
-        pubsub_url = network.pubsub_protocol + '://' + network.pubsub_domain + ':' + network.pubsub_port,
+    var pubsub_url = config.ofrc.pubsub_url,
         clientAuth = {
             outgoing: function(message, callback) {
                 // leave non-subscribe messages alone
@@ -32,8 +31,9 @@ ps.init = function(fc) {
             }
         };
 
+    debug(pubsub_url);
     // add a pubsub client for the API server
-    ps.client = new faye.Client(pubsub_url + '/faye');
+    ps.client = new faye.Client(pubsub_url);
     ps.client.addExtension(clientAuth);
     // handlers for pubsub connection events
     ps.client.on('transport:down', function() {
