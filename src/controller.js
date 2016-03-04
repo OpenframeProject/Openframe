@@ -194,15 +194,18 @@ fc.changeArtwork = function() {
             if (old_artwork) {
                 _endArt(old_format.end_command, tokens)
                     .then(function() {
-                        _startArt(new_format.start_command, tokens);
-                        fc.current_artwork = new_artwork;
-                        resolve();
+                        _startArt(new_format.start_command, tokens).then(function() {
+                            fc.current_artwork = new_artwork;
+                            fc.pubsub.publish('/frame/'+frame.state.id+'/frame_updated', frame.state.id);
+                            resolve();
+                        });
                     })
                     .catch(reject);
             } else {
-                _startArt(new_format.start_command, tokens);
-                fc.current_artwork = new_artwork;
-                resolve();
+                _startArt(new_format.start_command, tokens).then(function() {
+                    fc.current_artwork = new_artwork;
+                    resolve();
+                });
             }
         }
 
@@ -229,6 +232,10 @@ fc.changeArtwork = function() {
 };
 
 fc.updateFrame = function() {
+    // let subscribers know the frame is updating
+    fc.pubsub.publish('/frame/'+frame.state.id+'/frame_updating', frame.state.id);
+
+    // fetch the latest frame state, and update as needed
     frame.fetch()
         .then(function(new_state) {
             pm.installPlugins(new_state.plugins)

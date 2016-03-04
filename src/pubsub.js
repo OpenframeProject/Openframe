@@ -47,8 +47,8 @@ ps.init = function(fc) {
         ps.client.publish('/frame/connected', frame.state.id);
     });
 
-    ps.client.subscribe('/frame/' + frame.state.id + '/updated', function(data) {
-        debug('/frame/' + frame.state.id + '/updated');
+    ps.client.subscribe('/frame/' + frame.state.id + '/db_updated', function(data) {
+        debug('/frame/' + frame.state.id + '/db_updated');
 
         // frame updated event handled, hand off frame updating logic to frame controller
         fc.updateFrame();
