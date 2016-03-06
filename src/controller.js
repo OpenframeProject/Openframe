@@ -52,8 +52,17 @@ fc.init = function() {
 fc.ready = function() {
     debug('ready');
 
+
+
     if (frame.state && frame.state._current_artwork) {
         fc.changeArtwork();
+    } else {
+        // No current artwork... give the user a message:
+        console.log('\n\n');
+        console.log('[o]   Frame connected!');
+        console.log('\n');
+        console.log('This frame should now appear as ' + frame.state.name + ' when you log in to Openframe at ' + config.ofrc.network.api_url + '.');
+        console.log('\n');
     }
 };
 
