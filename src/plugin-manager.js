@@ -137,6 +137,9 @@ function _installPlugin(package_name, version, force) {
     });
 }
 
+// public exposure
+pm.installPlugin = _installPlugin;
+
 /**
  * Removes a single plugin by removing it from the npm package.
  *

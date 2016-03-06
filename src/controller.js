@@ -27,7 +27,6 @@ util.inherits(fc, EventEmitter);
 
 /**
  * Initialize the frame controller
- * - generate Swagger client
  * - login user
  * - connect frame
  * - update frame
@@ -47,18 +46,59 @@ fc.init = function() {
 };
 
 /**
+ * Install a plugin.
+ * - login user
+ * - pull latest frame state
+ * - install plugin package
+ * - add plugin to frame.plugins
+ * - exit with user-facing success/error message
+ *
+ * @param  {String} plugin An npm-style dependency string (package[@version]);
+ */
+fc.installPlugin = function(plugin) {
+    debug('installPlugin', plugin);
+
+    var pluginParts = plugin.split('@'),
+        packageName = pluginParts[0],
+        version = pluginParts.length > 1 ? pluginParts[1] : '';
+
+    this.login()
+        .then(function() {
+            frame.fetch()
+                .then(function() {
+                    pm.installPlugin(packageName, version, true)
+                        .then(function() {
+                            debug('Installed ' + plugin + ' successfully, saving frame...');
+                            // successfully installed plugin locally, add to frame
+                            frame.state.plugins.packageName = version;
+                            frame.save()
+                                .then(function() {
+                                    console.log('[o]   Extension installed successfully!\n');
+                                });
+                        });
+                })
+                .catch(function(err) {
+                    if (err.status === 404) {
+                        console.log('\n');
+                        console.log('[o]   ERROR: This frame has been set up perviously, but is not attached this user.');
+                        console.log('\n');
+                        console.log('To reset the frame entirely, restart using: openframe -r');
+                    }
+                });
+        });
+};
+
+/**
  * Called when the frame has finished initializing.
  */
 fc.ready = function() {
     debug('ready');
 
-
-
     if (frame.state && frame.state._current_artwork) {
         fc.changeArtwork();
     } else {
         // No current artwork... give the user a message:
-        console.log('\n\n');
+        console.log('\n');
         console.log('[o]   Frame connected!');
         console.log('\n');
         console.log('This frame should now appear as ' + frame.state.name + ' when you log in to Openframe at ' + config.ofrc.network.api_url + '.');
@@ -94,6 +134,7 @@ fc.login = function() {
         }).catch(function(err) {
             // login failed...
             debug('Login failed. Please try again.');
+            console.log('Login failed. Please try again.');
             user.state = {};
             user
                 .save()

@@ -15,7 +15,7 @@ var program = require('commander'),
 program
     .version(version)
     .option('-r, --reset', 'Reset this frame. Erases current frame data, and registers this as a new frame.')
-    // .option('-d, --domain [domain]', 'The domain where the API server sits.')
+    .option('-i, --install [extension]', 'Install an extension. The argument should be in the npm package name format, e.g. "openframe-image" or "openframe-image@^0.1.0"')
     // .option('-p, --port [port]', 'The port on which the API server is listening.')
     .arguments('[username] [password] [framename]')
     // .action(function(username, password, framename) {
@@ -23,7 +23,7 @@ program
     // })
     .parse(process.argv);
 
-// load config and frame from local dot files
+// load config, frame, and user from local dot files
 initializers = [
     config.load(),
     frame.load(),
@@ -143,6 +143,15 @@ function saveAnswers(answers) {
  */
 function init() {
     debug('Initializing Frame Controller');
-    frame_controller.init();
+
+    // if we've gotten here, presumably we have a user/pass
+    if (program.install) {
+        console.log('\n');
+        console.log('[o]   Installing ' + program.install + ' extension...');
+        console.log('\n');
+        frame_controller.installPlugin(program.install);
+    } else {
+        frame_controller.init();
+    }
 }
 
