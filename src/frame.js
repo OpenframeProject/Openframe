@@ -31,20 +31,16 @@ frame.save = function(persist) {
     debug('save');
     var _persist = persist === false ? false : true;
 
-    // careful about circular saving... save on the server triggers save locally, triggers save to server, etc...
-    rest.client.Frame.Frame_upsert({
-        data: frame.state,
-        id: frame.state.id
-    })
-    .then(function(data) {
-        debug('saved!');
-    })
-    .catch(debug);
-
     // TODO: save to server
     if (_persist) {
         frame.persistStateToFile();
     }
+
+    // careful about circular saving... save on the server triggers save locally, triggers save to server, etc...
+    return rest.client.Frame.Frame_upsert({
+        data: frame.state,
+        id: frame.state.id
+    }).catch(debug);
 };
 
 /**
@@ -67,7 +63,9 @@ frame.fetch = function() {
                 });
 
 
-            }).catch(reject);
+            }).catch(function(err) {
+                reject();
+            });
         } else {
             reject();
         }
