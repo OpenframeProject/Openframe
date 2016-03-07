@@ -2,6 +2,6 @@
   "network": {
     "api_protocol": "http",
     "api_domain": "openframe.io",
-    "api_port": "8888"
+    "api_port": "80"
   }
 }
