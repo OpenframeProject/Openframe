@@ -16,11 +16,8 @@ program
     .version(version)
     .option('-r, --reset', 'Reset this frame. Erases current frame data, and registers this as a new frame.')
     .option('-i, --install [extension]', 'Install an extension. The argument should be in the npm package name format, e.g. "openframe-image" or "openframe-image@^0.1.0"')
-    // .option('-p, --port [port]', 'The port on which the API server is listening.')
+    .option('-u, --uninstall [extension]', 'Uninstall an extension. The argument should be the npm package name, e.g. "openframe-image"')
     .arguments('[username] [password] [framename]')
-    // .action(function(username, password, framename) {
-
-    // })
     .parse(process.argv);
 
 // load config, frame, and user from local dot files
@@ -150,6 +147,11 @@ function init() {
         console.log('[o]   Installing ' + program.install + ' extension...');
         console.log('\n');
         frame_controller.installPlugin(program.install);
+    } else if (program.uninstall) {
+        console.log('\n');
+        console.log('[o]   Uninstalling ' + program.uninstall + ' extension...');
+        console.log('\n');
+        frame_controller.uninstallPlugin(program.uninstall);
     } else {
         frame_controller.init();
     }

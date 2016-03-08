@@ -144,22 +144,21 @@ pm.installPlugin = _installPlugin;
  * Removes a single plugin by removing it from the npm package.
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for plugins not in NPM)
  * @return {Promise} A promise resolving with the package_name
  */
-function _removePlugin(package_name, version) {
-    debug('removePlugin', package_name, version);
+function _removePlugin(package_name) {
+    debug('removePlugin', package_name);
     var cmd = 'npm remove ' + package_name;
-    if (version) {
-        cmd += '@'+version;
-    }
     cmd += ' --save';
     return new Promise((resolve, reject) => {
         _runNpmCommand(cmd).then(function() {
             resolve(package_name);
-        });
+        }).catch(reject);
     });
 }
+
+// public exposure
+pm.uninstallPlugin = _removePlugin;
 
 /**
  * Check whether a plugin is already installed.

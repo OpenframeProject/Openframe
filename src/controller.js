@@ -70,11 +70,55 @@ fc.installPlugin = function(plugin) {
                         .then(function() {
                             debug('Installed ' + plugin + ' successfully, saving frame...');
                             // successfully installed plugin locally, add to frame
-                            frame.state.plugins.packageName = version;
+                            frame.state.plugins[packageName] = version;
                             frame.save()
                                 .then(function() {
                                     console.log('[o]   Extension installed successfully!\n');
                                 });
+                        });
+                })
+                .catch(function(err) {
+                    if (err.status === 404) {
+                        console.log('\n');
+                        console.log('[o]   ERROR: This frame has been set up perviously, but is not attached this user.');
+                        console.log('\n');
+                        console.log('To reset the frame entirely, restart using: openframe -r');
+                    }
+                });
+        });
+};
+
+/**
+ * Uninstall a plugin.
+ * - login user
+ * - pull latest frame state
+ * - uninstall plugin package
+ * - remove plugin to frame.plugins
+ * - exit with user-facing success/error message
+ *
+ * @param  {String} plugin name (npm package);
+ */
+fc.uninstallPlugin = function(packageName) {
+    debug('uninstallPlugin', packageName);
+
+    this.login()
+        .then(function() {
+            frame.fetch()
+                .then(function() {
+                    pm.uninstallPlugin(packageName)
+                        .then(function() {
+                            debug('Uninstalled ' + packageName + ' successfully, saving frame...');
+                            // successfully installed plugin locally, add to frame
+                            if (packageName in frame.state.plugins) {
+                                delete frame.state.plugins[packageName];
+                            }
+                            frame.save()
+                                .then(function(resp) {
+                                    // debug(resp);
+                                    console.log('[o]   Extension uninstalled successfully!\n');
+                                });
+                        }).catch(function(err) {
+                            console.log('[o]   ERROR: Problem uninstalling the extension. Are you sure it is installed?\n');
                         });
                 })
                 .catch(function(err) {
@@ -97,11 +141,15 @@ fc.ready = function() {
     if (frame.state && frame.state._current_artwork) {
         fc.changeArtwork();
     } else {
+        // remove port if it's 80
+        var url_port = config.ofrc.network.api_url.split(':');
+        var url = url_port[2] === '80' ? url_port[0] + url_port[1] : config.ofrc.network.api_url;
+
         // No current artwork... give the user a message:
         console.log('\n');
         console.log('[o]   Frame connected!');
         console.log('\n');
-        console.log('This frame should now appear as ' + frame.state.name + ' when you log in to Openframe at ' + config.ofrc.network.api_url + '.');
+        console.log('This frame should now appear as ' + frame.state.name + ' when you log in to Openframe at ' + url + '.');
         console.log('\n');
     }
 };
