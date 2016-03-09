@@ -152,7 +152,7 @@ fc.ready = function() {
 
 
         // No current artwork... give the user a message:
-        console.log('[o]   Frame connected!');
+        console.log('[o]   Connected! You can now push artwork to this frame.');
         console.log('\n');
         console.log('This frame should now appear as ' + frame.state.name + ' when you log in to Openframe at ' + url + '.');
         console.log('\n');
