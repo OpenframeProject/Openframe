@@ -18,6 +18,8 @@ var util = require('util'),
     frame = require('./frame'),
     user = require('./user'),
     rest = require('./rest'),
+    Spinner = require('cli-spinner').Spinner,
+    spinner = new Spinner('[%s]'),
 
     // --> EXPORT
     fc = module.exports = {};
@@ -36,6 +38,10 @@ util.inherits(fc, EventEmitter);
  */
 fc.init = function() {
     debug('init');
+
+    console.log('\n');
+    spinner.setSpinnerString(1);
+    spinner.start();
 
     this.login()
         .then(this.connect)
@@ -79,7 +85,6 @@ fc.installPlugin = function(plugin) {
                 })
                 .catch(function(err) {
                     if (err.status === 404) {
-                        console.log('\n');
                         console.log('[o]   ERROR: This frame has been set up perviously, but is not attached this user.');
                         console.log('\n');
                         console.log('To reset the frame entirely, restart using: openframe -r');
@@ -123,7 +128,6 @@ fc.uninstallPlugin = function(packageName) {
                 })
                 .catch(function(err) {
                     if (err.status === 404) {
-                        console.log('\n');
                         console.log('[o]   ERROR: This frame has been set up perviously, but is not attached this user.');
                         console.log('\n');
                         console.log('To reset the frame entirely, restart using: openframe -r');
@@ -137,6 +141,7 @@ fc.uninstallPlugin = function(packageName) {
  */
 fc.ready = function() {
     debug('ready');
+    spinner.stop(true);
 
     if (frame.state && frame.state._current_artwork) {
         fc.changeArtwork();
@@ -145,8 +150,8 @@ fc.ready = function() {
         var url_port = config.ofrc.network.api_url.split(':');
         var url = url_port[2] === '80' ? url_port[0] + url_port[1] : config.ofrc.network.api_url;
 
+
         // No current artwork... give the user a message:
-        console.log('\n');
         console.log('[o]   Frame connected!');
         console.log('\n');
         console.log('This frame should now appear as ' + frame.state.name + ' when you log in to Openframe at ' + url + '.');
