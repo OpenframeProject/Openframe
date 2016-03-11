@@ -187,12 +187,14 @@ fc.login = function() {
         }).catch(function(err) {
             // login failed...
             debug('Login failed. Please try again.');
-            console.log('Login failed. Please try again.');
+            spinner.stop(true);
+            console.log('[o]   Login failed. Please try again.');
+            console.log('\n');
             user.state = {};
             user
                 .save()
                 .then(function() {
-                    reject(err);
+                    process.exit(0);
                 });
         });
     });
