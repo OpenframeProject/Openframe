@@ -38,6 +38,7 @@
     "openframe-glslviewer": "^0.1.1",
     "openframe-image": "^0.1.6",
     "openframe-website": "^0.1.1",
+    "request": "^2.69.0",
     "swagger-client": "^2.1.9"
   },
   "devDependencies": {
