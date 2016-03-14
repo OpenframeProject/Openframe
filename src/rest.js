@@ -22,6 +22,9 @@ rest.init = function() {
             rest.client = client;
             resolve(client);
         }).catch(function(err) {
+            console.log('\n');
+            console.log('[o]   ERROR: The server is not available.');
+            console.log('\n');
             reject(err);
         });
     });
