@@ -321,8 +321,8 @@ fc.changeArtwork = function() {
             file_name = path.basename(parsed.pathname);
 
             downloader.downloadFile(new_artwork.url, new_artwork.id + file_name)
-                .then(function(file) {
-                    tokens['$filepath'] = file.path;
+                .then(function(filePath) {
+                    tokens['$filepath'] = filePath;
                     swapArt();
                 })
                 .catch(reject);
