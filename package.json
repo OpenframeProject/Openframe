@@ -4,7 +4,7 @@
   "description": "Openframe controller process which runs on the machine controlling the frame.",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "start": "node ./bin/cli.js",
     "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "install": "./install.sh"
