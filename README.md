@@ -6,7 +6,7 @@ The Openframe controller is the software that runs on the frame itself (i.e. the
 
 The block diagram below represents a proposed architecture for the Openframe platform. It will continue to evolve as development on the project progresses.
 
-![alt tag](https://raw.github.com/OpenframeProject/Openframe-APIServer/restify/docs/img/API Diagram.jpg)
+![alt tag](https://raw.githubusercontent.com/OpenframeProject/openframeproject.github.io/master/img/API%20Diagram%20v3.jpg)
 
 #### Modules
 
@@ -33,6 +33,12 @@ $ npm start
 ```
 
 Upon startup, the application will prompt you for your Openframe username and password, and a name for this frame. You can run this on a mac or linux machine (windows untested), though various artwork format extensions are likely to be developed with a specific target platform in mind.
+
+For DEBUG output, set the DEBUG env var:
+
+```bash
+$ DEBUG=* npm start
+```
 
 ### Configuration files
 
