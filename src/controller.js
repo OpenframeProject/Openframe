@@ -218,11 +218,12 @@ fc.connect = function(userId) {
             resolve();
         }
 
-        // BUG - catch plugin init error separately, otherwise a new frame is created.
+        // XXX - POTENTIAL BUG - catch plugin init error separately, otherwise a new frame is created.
         frame
             .fetch()
             .then(function() {
                 debug('ready to init...');
+                // initPlugins now always resolves, is never rejected
                 return pm.initPlugins(frame.state.plugins, fc.pluginApi);
             })
             .then(readyToConnect)
