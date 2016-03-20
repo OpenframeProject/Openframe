@@ -218,6 +218,7 @@ fc.connect = function(userId) {
             resolve();
         }
 
+        // BUG - catch plugin init error separately, otherwise a new frame is created.
         frame
             .fetch()
             .then(function() {
@@ -380,7 +381,9 @@ fc.pluginApi = {
         return fc.pubsub;
     },
     // access to the Swagger rest client
-    rest: rest.client
+    rest: function() {
+        return rest.client;
+    }
 };
 
 /**
