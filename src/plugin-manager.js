@@ -108,7 +108,7 @@ pm.initPlugins = function(plugins, ofPluginApi) {
  */
 function _installPlugin(package_name, version, force) {
     debug('installPlugin', package_name, version);
-    var cmd = 'npm install ' + package_name;
+    var cmd = 'npm install -g ' + package_name;
     if (version) {
         cmd += '@'+version;
     }
