@@ -383,6 +383,10 @@ fc.pluginApi = {
     // access to the Swagger rest client
     getRest: function() {
         return rest.client;
+    },
+    // access to the frame model reference
+    getFrame: function() {
+        return frame;
     }
 };
 
