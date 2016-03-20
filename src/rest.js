@@ -17,7 +17,7 @@ rest.init = function() {
             usePromise: true
         }).then(function(client) {
             // To see all available methods:
-            console.log(client);
+            // console.log(client);
 
             rest.client = client;
             resolve(client);
