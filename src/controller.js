@@ -218,10 +218,12 @@ fc.connect = function(userId) {
             resolve();
         }
 
+        // XXX - POTENTIAL BUG - catch plugin init error separately, otherwise a new frame is created.
         frame
             .fetch()
             .then(function() {
                 debug('ready to init...');
+                // initPlugins now always resolves, is never rejected
                 return pm.initPlugins(frame.state.plugins, fc.pluginApi);
             })
             .then(readyToConnect)
@@ -380,7 +382,13 @@ fc.pluginApi = {
         return fc.pubsub;
     },
     // access to the Swagger rest client
-    rest: rest.client
+    getRest: function() {
+        return rest.client;
+    },
+    // access to the frame model reference
+    getFrame: function() {
+        return frame;
+    }
 };
 
 /**
