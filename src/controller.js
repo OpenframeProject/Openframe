@@ -381,7 +381,7 @@ fc.pluginApi = {
         return fc.pubsub;
     },
     // access to the Swagger rest client
-    rest: function() {
+    getRest: function() {
         return rest.client;
     }
 };
