@@ -291,7 +291,7 @@ fc.changeArtwork = function() {
 
     return new Promise(function(resolve, reject) {
         // old artwork is new artwork, don't update.
-        if (old_artwork && old_artwork.id === new_artwork.id) {
+        if (old_artwork && JSON.stringify(old_artwork) === JSON.stringify(new_artwork)) {
             debug('new artwork same as current', old_artwork.id, new_artwork.id);
             return reject();
         }
