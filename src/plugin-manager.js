@@ -150,7 +150,7 @@ pm.installPlugin = _installPlugin;
  */
 function _removePlugin(package_name) {
     debug('removePlugin', package_name);
-    var cmd = 'npm remove ' + package_name;
+    var cmd = 'npm remove -g ' + package_name;
     cmd += ' --save';
     return new Promise((resolve, reject) => {
         _runNpmCommand(cmd).then(function() {
