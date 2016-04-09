@@ -101,8 +101,6 @@ pm.initPlugins = function(plugins, ofPluginApi) {
  *
  * Uses machine's npm as a child_process so that we don't have to depend on the npm package.
  *
- * TODO: don't re-install plugins that are already present
- *
  * @private
  *
  * @param  {String} package_name NPM package name
@@ -112,7 +110,7 @@ pm.initPlugins = function(plugins, ofPluginApi) {
  */
 function _installPlugin(package_name, version, force) {
     debug('installPlugin', package_name, version);
-    var cmd = 'npm install ' + package_name;
+    var cmd = 'npm install -g ' + package_name;
     if (version) {
         cmd += '@'+version;
     }
@@ -173,7 +171,7 @@ pm.uninstallPlugin = _removePlugin;
  */
 function _checkPlugin(package_name, version) {
     debug('checkPlugin', package_name, version);
-    var cmd = 'npm list ' + package_name;
+    var cmd = 'npm list -g ' + package_name;
     if (version) {
         cmd += '@'+version;
     }
