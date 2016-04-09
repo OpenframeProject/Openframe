@@ -9,6 +9,10 @@ var jsonfile = require('jsonfile'),
 
 frame.state = {};
 
+/**
+ * Load the current frate state from disk.
+ * @return {Promise}
+ */
 frame.load = function() {
     debug('load');
     return new Promise(function(resolve, reject) {
