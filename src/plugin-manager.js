@@ -34,7 +34,7 @@ pm.installPlugins = function(plugins, force) {
         key,
         _force = force === true ? true : false;
 
-    // add each plugin to package.json
+    // install each plugin
     for (key in plugins) {
         if (plugins.hasOwnProperty(key)) {
             promises.push(_installPlugin(key, plugins[key], _force));

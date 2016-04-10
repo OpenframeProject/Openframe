@@ -345,28 +345,41 @@ fc.updateFrame = function() {
     // fetch the latest frame state, and update as needed
     frame.fetch()
         .then(function(new_state) {
-            pm.installPlugins(new_state.plugins)
-                .then(function() {
-                    debug('-----> plugins installed');
-                    pm.initPlugins(frame.state.plugins, fc.pluginApi)
-                        .then(function() {
-                            // once we're done updating/initializing the frame plugins, call change artwork
-                            // TODO: we could add logic here to only update necessary items...
-                            // For now, changeArtwork should exit if old and new artwork are the same
-                            // TODO: DRY with else below
-                            if (frame.state._current_artwork) {
-                                fc.changeArtwork()
-                                    .then(function() {
-                                        // success changing artwork
-                                    })
-                                    .catch(function() {
-                                        // error changing artwork, reset frame.state._current_artwork to true current
-                                        frame.state._current_artwork = fc.current_artwork;
-                                    });
-                            }
-                        });
-                })
-                .catch(debug);
+            if (frame.state._current_artwork) {
+                fc.changeArtwork()
+                    .then(function() {
+                        // success changing artwork
+                    })
+                    .catch(function() {
+                        // error changing artwork, reset frame.state._current_artwork to true current
+                        frame.state._current_artwork = fc.current_artwork;
+                    });
+            }
+            // Until we get the base extension module ready, which will handle init status,
+            // don't install/init plugins on frame update
+            //
+            // pm.installPlugins(new_state.plugins)
+            //     .then(function() {
+            //         debug('-----> plugins installed');
+            //         pm.initPlugins(frame.state.plugins, fc.pluginApi)
+            //             .then(function() {
+            //                 // once we're done updating/initializing the frame plugins, call change artwork
+            //                 // TODO: we could add logic here to only update necessary items...
+            //                 // For now, changeArtwork should exit if old and new artwork are the same
+            //                 // TODO: DRY with else below
+            //                 if (frame.state._current_artwork) {
+            //                     fc.changeArtwork()
+            //                         .then(function() {
+            //                             // success changing artwork
+            //                         })
+            //                         .catch(function() {
+            //                             // error changing artwork, reset frame.state._current_artwork to true current
+            //                             frame.state._current_artwork = fc.current_artwork;
+            //                         });
+            //                 }
+            //             });
+            //     })
+            //     .catch(debug);
         });
 };
 
