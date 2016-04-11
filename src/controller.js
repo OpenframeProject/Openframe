@@ -263,7 +263,11 @@ fc.registerNewFrame = function(userId) {
             frame.persistStateToFile();
             pm.installPlugins(frame.state.plugins)
                 .then(function() {
-                    resolve(frame.state);
+                    debug('-----> plugins installed');
+                    pm.initPlugins(frame.state.plugins, fc.pluginApi)
+                        .then(function() {
+                            resolve(frame.state);
+                        });
                 })
                 .catch(function(err) {
                     reject(err);
