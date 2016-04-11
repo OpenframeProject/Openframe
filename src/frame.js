@@ -8,6 +8,7 @@ var jsonfile = require('jsonfile'),
     frame = module.exports = {};
 
 frame.state = {};
+frame.formats = {};
 
 /**
  * Load the current frate state from disk.
@@ -119,7 +120,7 @@ frame.inflateStateFromFile = function() {
  */
 frame.addFormat = function(format) {
     debug('addFormat');
-    frame.state.formats = frame.state.formats || {};
-    frame.state.formats[format.name] = format;
+    frame.formats = frame.formats || {};
+    frame.formats[format.name] = format;
     frame.persistStateToFile();
 };

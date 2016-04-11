@@ -280,14 +280,16 @@ fc.registerNewFrame = function(userId) {
  * Frame's _current_artwork.
  */
 fc.changeArtwork = function() {
-    debug('changeArtwork', fc.current_artwork, frame.state._current_artwork);
+    debug('changeArtwork', frame.state._current_artwork);
 
     var old_artwork = fc.current_artwork || undefined,
         new_artwork = frame.state._current_artwork,
-        old_format = old_artwork && frame.state.formats[old_artwork.format],
-        new_format = frame.state.formats[new_artwork.format],
+        old_format = old_artwork && frame.formats[old_artwork.format],
+        new_format = frame.formats[new_artwork.format],
         tokens = {},
         parsed, file_name;
+
+    debug('details', old_artwork, old_format, new_artwork, new_format);
 
     return new Promise(function(resolve, reject) {
         // old artwork is new artwork, don't update.
