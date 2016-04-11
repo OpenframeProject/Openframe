@@ -1,6 +1,6 @@
 {
   "name": "openframe",
-  "version": "0.1.33",
+  "version": "0.1.31",
   "description": "Openframe controller process which runs on the machine controlling the frame.",
   "main": "index.js",
   "scripts": {
@@ -36,12 +36,12 @@
     "http-request": "^0.7.0",
     "inquirer": "^0.11.1",
     "jsonfile": "^2.2.1",
-    "openframe-glslviewer": "^0.1.1",
-    "openframe-image": "^0.1.6",
-    "openframe-website": "^0.1.1",
     "swagger-client": "^2.1.9"
   },
   "devDependencies": {
+    "openframe-glslviewer": "^0.1.1",
+    "openframe-image": "^0.1.6",
+    "openframe-website": "^0.1.1",
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
     "npm": "^3.5.3",
