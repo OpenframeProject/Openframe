@@ -66,7 +66,7 @@ fc.installExtension = function(extension) {
 
     var extensionParts = extension.split('@'),
         packageName = extensionParts[0],
-        version = extensionParts.length > 1 ? extensionParts[1] : '';
+        version = extensionParts.length > 1 ? extensionParts[1] : '*';
 
     this.login()
         .then(function() {
