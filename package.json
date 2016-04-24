@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./bin/cli.js",
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "lint": "./node_modules/.bin/eslint extension.js test/**",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "test": "npm run lint && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "test-coveralls": "npm run lint && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && npm run coveralls",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "install": "./install.sh"
   },
@@ -42,13 +45,16 @@
     "openframe-glslviewer": "^0.1.1",
     "openframe-image": "^0.1.6",
     "openframe-website": "^0.1.1",
+    "coveralls": "^2.11.9",
+    "eslint": "^2.8.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
-    "npm": "^3.5.3",
-    "sinon": "^1.17.2"
+    "sinon": "^1.17.2",
+    "npm": "^3.5.3"
   },
   "keywords": [
     "openframe",
+    "raspberry-pi",
     "art",
     "artwork",
     "frame"

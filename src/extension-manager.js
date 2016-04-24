@@ -1,4 +1,4 @@
-var debug = require('debug')('openframe:plugin_manager'),
+var debug = require('debug')('openframe:extensions_manager'),
     execFile = require('child_process').execFile,
     exec = require('child_process').exec,
 
@@ -7,7 +7,7 @@ var debug = require('debug')('openframe:plugin_manager'),
     pm = module.exports = {};
 
 /**
- * Initialize plugins module
+ * Initialize extensionss module
  *
  * TODO: UNUSED - delete me?
  *
@@ -18,26 +18,26 @@ pm.init = function() {
 };
 
 /**
- * Install plugins.
+ * Install extensionss.
  *
  * TODO: since we're just running npm cli via exec(), and reason not to install
- * all plugins at once instead of one at a time?
+ * all extensionss at once instead of one at a time?
  *
- * @param {object} plugins A hash of plugins to install
- * @param {Boolean} force Install the plugin even if it's already installed (skip the check)
- * @return {Promise} A promise resolved with all of the npmi results for each plugin
+ * @param {object} extensionss A hash of extensionss to install
+ * @param {Boolean} force Install the extensions even if it's already installed (skip the check)
+ * @return {Promise} A promise resolved with all of the npmi results for each extensions
  */
-pm.installPlugins = function(plugins, force) {
-    debug('installPlugins');
+pm.installExtensions = function(extensionss, force) {
+    debug('installExtensions');
 
     var promises = [],
         key,
         _force = force === true ? true : false;
 
-    // install each plugin
-    for (key in plugins) {
-        if (plugins.hasOwnProperty(key)) {
-            promises.push(_installPlugin(key, plugins[key], _force));
+    // install each extensions
+    for (key in extensionss) {
+        if (extensionss.hasOwnProperty(key)) {
+            promises.push(_installExtension(key, extensionss[key], _force));
         }
     }
 
@@ -45,22 +45,22 @@ pm.installPlugins = function(plugins, force) {
 };
 
 /**
- * Add a new plugin to this frame.
+ * Add a new extensions to this frame.
  *
- * Installs the plugin, and if that's successful then adds it to the plugins list.
+ * Installs the extensions, and if that's successful then adds it to the extensionss list.
  *
- * TODO: deal with conflicting versions of plugins
+ * TODO: deal with conflicting versions of extensionss
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for plugins not in NPM)
+ * @param  {String} version      NPM package version (or repo URL for extensionss not in NPM)
  * @return {Promise} A promise resolving with the result from npmi
  */
-pm.addPlugin = function(package_name, version) {
-    debug('addPlugin', package_name, version);
+pm.addExtension = function(package_name, version) {
+    debug('addExtension', package_name, version);
     return new Promise((resolve, reject) => {
-        pm.installPlugin(package_name, version)
+        pm.installExtension(package_name, version)
             .then(function() {
-                pm.plugins[package_name] = version;
+                pm.extensionss[package_name] = version;
                 config.save();
                 resolve(package_name);
             })
@@ -72,21 +72,21 @@ pm.addPlugin = function(package_name, version) {
 };
 
 /**
- * Initialize plugins.
+ * Initialize extensionss.
  *
- * @param  {String} plugin
- * @param  {Object} ofPluginApi An interface to the frame provided to each plugin
+ * @param  {String} extensions
+ * @param  {Object} ofExtensionApi An interface to the frame provided to each extensions
  */
-pm.initPlugins = function(plugins, ofPluginApi) {
-    debug('initPlugins', plugins);
+pm.initExtensions = function(extensionss, ofExtensionApi) {
+    debug('initExtensions', extensionss);
     var promises = [],
         key;
 
     return new Promise((resolve, reject) => {
-        // add each plugin to package.json
-        for (key in plugins) {
-            if (plugins.hasOwnProperty(key)) {
-                promises.push(_initPlugin(key, ofPluginApi));
+        // add each extensions to package.json
+        for (key in extensionss) {
+            if (extensionss.hasOwnProperty(key)) {
+                promises.push(_initExtension(key, ofExtensionApi));
             }
         }
 
@@ -97,19 +97,19 @@ pm.initPlugins = function(plugins, ofPluginApi) {
 };
 
 /**
- * Install a single plugin via NPM
+ * Install a single extensions via NPM
  *
  * Uses machine's npm as a child_process so that we don't have to depend on the npm package.
  *
  * @private
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for plugins not in NPM)
- * @param {Boolean} force Install the plugin even if it's already installed (skip the check)
+ * @param  {String} version      NPM package version (or repo URL for extensionss not in NPM)
+ * @param {Boolean} force Install the extensions even if it's already installed (skip the check)
  * @return {Promise} A promise resolving with the package_name
  */
-function _installPlugin(package_name, version, force) {
-    debug('installPlugin', package_name, version);
+function _installExtension(package_name, version, force) {
+    debug('installExtension', package_name, version);
     var cmd = 'npm install -g ' + package_name;
     if (version) {
         cmd += '@'+version;
@@ -121,7 +121,7 @@ function _installPlugin(package_name, version, force) {
                 resolve(package_name);
             });
         } else {
-            _checkPlugin(package_name, version).then(function(is_installed) {
+            _checkExtension(package_name, version).then(function(is_installed) {
                 if (!is_installed) {
                     // only install if it's not already installed.
                     _runNpmCommand(cmd).then(function() {
@@ -140,16 +140,16 @@ function _installPlugin(package_name, version, force) {
 }
 
 // public exposure
-pm.installPlugin = _installPlugin;
+pm.installExtension = _installExtension;
 
 /**
- * Removes a single plugin by removing it from the npm package.
+ * Removes a single extensions by removing it from the npm package.
  *
  * @param  {String} package_name NPM package name
  * @return {Promise} A promise resolving with the package_name
  */
-function _removePlugin(package_name) {
-    debug('removePlugin', package_name);
+function _removeExtension(package_name) {
+    debug('removeExtension', package_name);
     var cmd = 'npm remove -g ' + package_name;
     cmd += ' --save';
     return new Promise((resolve, reject) => {
@@ -160,17 +160,17 @@ function _removePlugin(package_name) {
 }
 
 // public exposure
-pm.uninstallPlugin = _removePlugin;
+pm.uninstallExtension = _removeExtension;
 
 /**
- * Check whether a plugin is already installed.
+ * Check whether a extension is already installed.
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for plugins not in NPM)
- * @return {Promise} A promise resolving with either true (plugin installed) or false (plugin not installed)
+ * @param  {String} version      NPM package version (or repo URL for extensionss not in NPM)
+ * @return {Promise} A promise resolving with either true (extensions installed) or false (extensions not installed)
  */
-function _checkPlugin(package_name, version) {
-    debug('checkPlugin', package_name, version);
+function _checkExtension(package_name, version) {
+    debug('checkExtension', package_name, version);
     var cmd = 'npm list -g ' + package_name;
     if (version) {
         cmd += '@'+version;
@@ -178,22 +178,22 @@ function _checkPlugin(package_name, version) {
     return new Promise((resolve, reject) => {
         _runNpmCommand(cmd)
             .then(function() {
-                debug('plugin installed');
+                debug('extensions installed');
                 resolve(true);
             }).catch(function() {
-                debug('plugin NOT installed');
+                debug('extensions NOT installed');
                 resolve(false);
             });
     });
 }
 
 /**
- * Initialize a single plugin.
+ * Initialize a single extensions.
  *
- * If the plugin has an install.sh file, execute it. Then call the plugin's init method
+ * If the extensions has an install.sh file, execute it. Then call the extensions's init method
  * passing in a reference to the frame controller.
  *
- * TODO: initialize plugins with sandboxed API?
+ * TODO: initialize extensionss with sandboxed API?
  * - addFormat
  * - installDeps (?)
  *
@@ -201,20 +201,20 @@ function _checkPlugin(package_name, version) {
  *
  * @private
  *
- * @param  {String} plugin_name
- * @param  {Object} ofPluginApi An interface to the frame provided to each plugin
+ * @param  {String} extensions_name
+ * @param  {Object} ofExtensionApi An interface to the frame provided to each extensions
  * @return {Promise}
  */
-function _initPlugin(plugin_name, ofPluginApi) {
-    debug('_initPlugin', plugin_name);
-    var plugin;
+function _initExtension(extensions_name, ofExtensionApi) {
+    debug('_initExtension', extensions_name);
+    var extensions;
     return new Promise((resolve, reject) => {
         try {
-            plugin = require(plugin_name);
-            plugin.init(ofPluginApi);
-            resolve(plugin);
+            extensions = require(extensions_name);
+            extensions._init(ofExtensionApi);
+            resolve(extensions);
         } catch (e) {
-            // problem trying to require plugin
+            // problem trying to require extensions
             debug('ERROR - ', e);
             reject(e);
         }
