@@ -13,7 +13,7 @@ var util = require('util'),
     downloader = require('./downloader'),
     pubsub = require('./pubsub'),
     proc_man = require('./process-manager'),
-    pm = require('./plugin-manager'),
+    pm = require('./extension-manager'),
     config = require('./config'),
     frame = require('./frame'),
     user = require('./user'),
@@ -32,9 +32,9 @@ util.inherits(fc, EventEmitter);
  * - login user
  * - connect frame
  * - update frame
- * - update plugins
- * - if necessary, install plugins
- * - init plugins
+ * - update extensions
+ * - if necessary, install extensions
+ * - init extensions
  */
 fc.init = function() {
     debug('init');
@@ -52,30 +52,30 @@ fc.init = function() {
 };
 
 /**
- * Install a plugin.
+ * Install a extension.
  * - login user
  * - pull latest frame state
- * - install plugin package
- * - add plugin to frame.plugins
+ * - install extension package
+ * - add extension to frame.plugins
  * - exit with user-facing success/error message
  *
- * @param  {String} plugin An npm-style dependency string (package[@version]);
+ * @param  {String} extension An npm-style dependency string (package[@version]);
  */
-fc.installPlugin = function(plugin) {
-    debug('installPlugin', plugin);
+fc.installExtension = function(extension) {
+    debug('installExtension', extension);
 
-    var pluginParts = plugin.split('@'),
-        packageName = pluginParts[0],
-        version = pluginParts.length > 1 ? pluginParts[1] : '';
+    var extensionParts = extension.split('@'),
+        packageName = extensionParts[0],
+        version = extensionParts.length > 1 ? extensionParts[1] : '*';
 
     this.login()
         .then(function() {
             frame.fetch()
                 .then(function() {
-                    pm.installPlugin(packageName, version, true)
+                    pm.installExtension(packageName, version, true)
                         .then(function() {
-                            debug('Installed ' + plugin + ' successfully, saving frame...');
-                            // successfully installed plugin locally, add to frame
+                            debug('Installed ' + extension + ' successfully, saving frame...');
+                            // successfully installed extension locally, add to frame
                             frame.state.plugins[packageName] = version;
                             frame.save()
                                 .then(function() {
@@ -94,26 +94,26 @@ fc.installPlugin = function(plugin) {
 };
 
 /**
- * Uninstall a plugin.
+ * Uninstall a extension.
  * - login user
  * - pull latest frame state
- * - uninstall plugin package
- * - remove plugin to frame.plugins
+ * - uninstall extension package
+ * - remove extension to frame.plugins
  * - exit with user-facing success/error message
  *
- * @param  {String} plugin name (npm package);
+ * @param  {String} extension name (npm package);
  */
-fc.uninstallPlugin = function(packageName) {
-    debug('uninstallPlugin', packageName);
+fc.uninstallExtension = function(packageName) {
+    debug('uninstallExtension', packageName);
 
     this.login()
         .then(function() {
             frame.fetch()
                 .then(function() {
-                    pm.uninstallPlugin(packageName)
+                    pm.uninstallExtension(packageName)
                         .then(function() {
                             debug('Uninstalled ' + packageName + ' successfully, saving frame...');
-                            // successfully installed plugin locally, add to frame
+                            // successfully installed extension locally, add to frame
                             if (packageName in frame.state.plugins) {
                                 delete frame.state.plugins[packageName];
                             }
@@ -218,13 +218,13 @@ fc.connect = function(userId) {
             resolve();
         }
 
-        // XXX - POTENTIAL BUG - catch plugin init error separately, otherwise a new frame is created.
+        // XXX - POTENTIAL BUG - catch extension init error separately, otherwise a new frame is created.
         frame
             .fetch()
             .then(function() {
                 debug('ready to init...');
-                // initPlugins now always resolves, is never rejected
-                return pm.initPlugins(frame.state.plugins, fc.pluginApi);
+                // initExtensions now always resolves, is never rejected
+                return pm.initExtensions(frame.state.plugins, fc.extensionApi);
             })
             .then(readyToConnect)
             .catch(function(err) {
@@ -261,10 +261,10 @@ fc.registerNewFrame = function(userId) {
             debug(data.obj);
             frame.state = data.obj;
             frame.persistStateToFile();
-            pm.installPlugins(frame.state.plugins)
+            pm.installExtensions(frame.state.plugins)
                 .then(function() {
-                    debug('-----> plugins installed');
-                    pm.initPlugins(frame.state.plugins, fc.pluginApi)
+                    debug('-----> extensions installed');
+                    pm.initExtensions(frame.state.plugins, fc.extensionApi)
                         .then(function() {
                             resolve(frame.state);
                         });
@@ -290,6 +290,7 @@ fc.changeArtwork = function() {
         new_artwork = frame.state._current_artwork,
         old_format = old_artwork && frame.formats[old_artwork.format],
         new_format = frame.formats[new_artwork.format],
+        new_artwork_conf = new_artwork.config || {},
         tokens = {},
         parsed, file_name;
 
@@ -307,7 +308,7 @@ fc.changeArtwork = function() {
             if (old_artwork) {
                 _endArt(old_format.end_command, tokens)
                     .then(function() {
-                        _startArt(new_format.start_command, tokens).then(function() {
+                        _startArt(new_format.start_command, tokens, new_artwork_conf).then(function() {
                             fc.current_artwork = new_artwork;
                             fc.pubsub.publish('/frame/'+frame.state.id+'/frame_updated', frame.state.id);
                             resolve();
@@ -315,7 +316,7 @@ fc.changeArtwork = function() {
                     })
                     .catch(reject);
             } else {
-                _startArt(new_format.start_command, tokens).then(function() {
+                _startArt(new_format.start_command, tokens, new_artwork_conf).then(function() {
                     fc.current_artwork = new_artwork;
                     resolve();
                 });
@@ -354,49 +355,24 @@ fc.updateFrame = function() {
             if (frame.state._current_artwork) {
                 fc.changeArtwork()
                     .then(function() {
-                        // success changing artwork
+                        // success changing artwork, do nothing more...
                     })
                     .catch(function() {
                         // error changing artwork, reset frame.state._current_artwork to true current
                         frame.state._current_artwork = fc.current_artwork;
                     });
             }
-            // Until we get the base extension module ready, which will handle init status,
-            // don't install/init plugins on frame update
-            //
-            // pm.installPlugins(new_state.plugins)
-            //     .then(function() {
-            //         debug('-----> plugins installed');
-            //         pm.initPlugins(frame.state.plugins, fc.pluginApi)
-            //             .then(function() {
-            //                 // once we're done updating/initializing the frame plugins, call change artwork
-            //                 // TODO: we could add logic here to only update necessary items...
-            //                 // For now, changeArtwork should exit if old and new artwork are the same
-            //                 // TODO: DRY with else below
-            //                 if (frame.state._current_artwork) {
-            //                     fc.changeArtwork()
-            //                         .then(function() {
-            //                             // success changing artwork
-            //                         })
-            //                         .catch(function() {
-            //                             // error changing artwork, reset frame.state._current_artwork to true current
-            //                             frame.state._current_artwork = fc.current_artwork;
-            //                         });
-            //                 }
-            //             });
-            //     })
-            //     .catch(debug);
         });
 };
 
 /**
- * A sandboxed API passed into plugins' init function.
+ * A sandboxed API passed into extensions' init function.
  * @type {Object}
  */
-fc.pluginApi = {
-    // let the plugin add a format to the frame
+fc.extensionApi = {
+    // let the extension add a format to the frame
     addFormat: frame.addFormat,
-    // give the plugin access to the global pubsub
+    // give the extension access to the global pubsub
     getPubsub: function() {
         return fc.pubsub;
     },
@@ -416,8 +392,13 @@ fc.pluginApi = {
  * @param  {object} tokens
  * @return {Promise}
  */
-function _startArt(_command, tokens) {
+function _startArt(_command, tokens, args) {
     debug('startArt');
+    if (typeof _command === 'function') {
+        // we should be passing artwork-specific args in here, letting the format
+        // construct the command dynamically...
+        _command = _command(args);
+    }
     var command = _replaceTokens(_command, tokens);
 
     return new Promise(function(resolve, reject) {

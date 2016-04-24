@@ -71,6 +71,7 @@ env:
   node: true
   # allow commonjs module definition globals (e.g. require, module.exports)
   commonjs: true
+  mocha: true
   es6: true
 
 

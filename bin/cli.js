@@ -146,12 +146,12 @@ function init() {
         console.log('\n');
         console.log('[o]   Installing ' + program.install + ' extension...');
         console.log('\n');
-        frame_controller.installPlugin(program.install);
+        frame_controller.installExtension(program.install);
     } else if (program.uninstall) {
         console.log('\n');
         console.log('[o]   Uninstalling ' + program.uninstall + ' extension...');
         console.log('\n');
-        frame_controller.uninstallPlugin(program.uninstall);
+        frame_controller.uninstallExtension(program.uninstall);
     } else {
         frame_controller.init();
     }
