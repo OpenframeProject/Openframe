@@ -14,6 +14,9 @@ arq=$(uname -m)
 mkdir -p ~/.openframe
 cp .ofrc ~/.openframe/.ofrc
 
+echo "Update default extensions"
+npm update -g openframe-image openframe-video openframe-glslviewer openframe-website
+
 if [ $os == "Linux" ]; then
 
     # on Debian Linux distributions
