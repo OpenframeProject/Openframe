@@ -2,6 +2,7 @@
 
 var program = require('commander'),
     inquirer = require('inquirer'),
+    fs = require('fs'),
     debug = require('debug')('openframe:cli'),
     p = require('../package.json'),
     version = p.version.split('.').shift(),
@@ -10,6 +11,7 @@ var program = require('commander'),
     user = require('../src/user'),
     rest = require('../src/rest'),
     frame_controller = require('../src/controller'),
+    proc_man = require('../src/process-manager'),
     initializers;
 
 program
@@ -85,6 +87,15 @@ function processArgs() {
         });
     }
 
+    if (config.ofrc.autoboot === undefined) {
+        // ask frame name
+        questions.push({
+            name: 'autoboot',
+            message: 'Do you want to boot openframe on startup?:',
+            type: 'confirm'
+        });
+    }
+
     if (questions.length) {
         inquirer.prompt(questions, function(answers) {
             saveAnswers(answers)
@@ -107,8 +118,10 @@ function reset() {
     return new Promise(function(resolve, reject) {
         user.state = {};
         frame.state = {};
+        delete config.ofrc.autoboot;
         user.save()
             .then(frame.persistStateToFile)
+            .then(config.save)
             .then(resolve)
             .catch(reject);
     });
@@ -130,9 +143,23 @@ function saveAnswers(answers) {
         if (answers.frame_name) {
             frame.state.name = answers.frame_name;
         }
+        if (answers.autoboot) {
+            config.ofrc.autoboot = answers.autoboot;
+            updateBashRc();
+        }
     }
 
     return user.save();
+
+    // return Promise.all([config.save(), user.save()]);
+}
+
+function updateBashRc() {
+    debug('Update .bashrc file for autoload');
+    proc_man.exec(`${__dirname}/../scripts/autoboot.sh`, (err, stdout, stderr) => {
+        debug(`stdout: ${stdout}`);
+        debug(`stderr: ${err}`);
+    });
 }
 
 /**
