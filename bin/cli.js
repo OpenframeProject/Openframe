@@ -3,6 +3,7 @@
 var program = require('commander'),
     inquirer = require('inquirer'),
     fs = require('fs'),
+    shell = require('shelljs'),
     debug = require('debug')('openframe:cli'),
     p = require('../package.json'),
     version = p.version.split('.').shift(),
@@ -144,8 +145,10 @@ function saveAnswers(answers) {
             frame.state.name = answers.frame_name;
         }
         if (answers.autoboot) {
-            config.ofrc.autoboot = answers.autoboot;
-            updateBashRc();
+            // config.ofrc.autoboot = answers.autoboot;
+            enableAutoboot();
+        } else {
+            disableAutoboot();
         }
     }
 
@@ -154,12 +157,15 @@ function saveAnswers(answers) {
     // return Promise.all([config.save(), user.save()]);
 }
 
-function updateBashRc() {
-    debug('Update .bashrc file for autoload');
-    proc_man.exec(`${__dirname}/../scripts/autoboot.sh`, (err, stdout, stderr) => {
-        debug(`stdout: ${stdout}`);
-        debug(`stderr: ${err}`);
-    });
+function enableAutoboot() {
+    debug('----->>> Enable Autoboot');
+    disableAutoboot();
+    shell.ShellString('~/.openframe/autoboot.sh\n').toEnd('~/.bashrc');
+}
+
+function disableAutoboot() {
+    debug('----->>> Disable Autoboot');
+    shell.sed('-i', /^.*openframe.*autoboot.*$/, '', '~/.bashrc');
 }
 
 /**
@@ -183,4 +189,3 @@ function init() {
         frame_controller.init();
     }
 }
-

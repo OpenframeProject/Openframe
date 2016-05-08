@@ -1,7 +1,6 @@
 #!/bin/bash
-echo "Autoboot"
 
-cat <<EOF >> ~/.bashrc
+# If n has been pressed, don't start openframe
 read -t 1 -n 1 key
     if [[ $key = n ]]
 then
@@ -12,4 +11,3 @@ else
     # change virtual terminal so that we don't see stray output:
     sudo chvt 4
 fi
-EOF
