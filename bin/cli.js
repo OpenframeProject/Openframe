@@ -152,9 +152,7 @@ function saveAnswers(answers) {
         }
     }
 
-    return user.save();
-
-    // return Promise.all([config.save(), user.save()]);
+    return Promise.all([config.save(), user.save()]);
 }
 
 function enableAutoboot() {

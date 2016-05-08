@@ -444,7 +444,7 @@ function _replaceTokens(_str, tokens) {
     for (key in tokens) {
         if (tokens.hasOwnProperty(key)) {
             // TODO: better token replacement (global replacement?)
-            str = _str.replace(key, tokens[key]);
+            str = str.replace(key, tokens[key]);
         }
     }
     return str;
