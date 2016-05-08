@@ -13,6 +13,7 @@ arq=$(uname -m)
 
 mkdir -p ~/.openframe
 cp .ofrc ~/.openframe/.ofrc
+cp ./scripts/autoboot.sh ~/.openframe/autoboot.sh
 
 echo "Update default extensions"
 npm update -g openframe-image openframe-video openframe-glslviewer openframe-website

@@ -227,7 +227,7 @@ function _runNpmCommand(cmd) {
     return new Promise((resolve, reject) => {
         exec(cmd, (err, stdout, stderr) => {
             debug(`stdout: ${stdout}`);
-            debug(`stderr: ${stderr}`);
+            debug(`stderr: ${err}`);
             if (err) {
                 reject(err);
             } else {

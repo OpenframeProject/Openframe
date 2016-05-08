@@ -2,6 +2,8 @@
 
 var program = require('commander'),
     inquirer = require('inquirer'),
+    fs = require('fs'),
+    shell = require('shelljs'),
     debug = require('debug')('openframe:cli'),
     p = require('../package.json'),
     version = p.version.split('.').shift(),
@@ -10,6 +12,7 @@ var program = require('commander'),
     user = require('../src/user'),
     rest = require('../src/rest'),
     frame_controller = require('../src/controller'),
+    proc_man = require('../src/process-manager'),
     initializers;
 
 program
@@ -85,6 +88,15 @@ function processArgs() {
         });
     }
 
+    if (config.ofrc.autoboot === undefined) {
+        // ask frame name
+        questions.push({
+            name: 'autoboot',
+            message: 'Do you want to boot openframe on startup?:',
+            type: 'confirm'
+        });
+    }
+
     if (questions.length) {
         inquirer.prompt(questions, function(answers) {
             saveAnswers(answers)
@@ -107,8 +119,10 @@ function reset() {
     return new Promise(function(resolve, reject) {
         user.state = {};
         frame.state = {};
+        delete config.ofrc.autoboot;
         user.save()
             .then(frame.persistStateToFile)
+            .then(config.save)
             .then(resolve)
             .catch(reject);
     });
@@ -130,9 +144,26 @@ function saveAnswers(answers) {
         if (answers.frame_name) {
             frame.state.name = answers.frame_name;
         }
+        if (answers.autoboot) {
+            // config.ofrc.autoboot = answers.autoboot;
+            enableAutoboot();
+        } else {
+            disableAutoboot();
+        }
     }
 
-    return user.save();
+    return Promise.all([config.save(), user.save()]);
+}
+
+function enableAutoboot() {
+    debug('----->>> Enable Autoboot');
+    disableAutoboot();
+    shell.ShellString('~/.openframe/autoboot.sh\n').toEnd('~/.bashrc');
+}
+
+function disableAutoboot() {
+    debug('----->>> Disable Autoboot');
+    shell.sed('-i', /^.*openframe.*autoboot.*$/, '', '~/.bashrc');
 }
 
 /**
@@ -156,4 +187,3 @@ function init() {
         frame_controller.init();
     }
 }
-
