@@ -50,4 +50,4 @@ After starting the application and answering the prompts, two additional files a
 
 Extensions are npm packages which add functionality to the frame, either by adding support for a new artwork format (i.e. media type) or by adding other functionality.
 
-For more info on extensions, see the [Openframe-ExtensionExample](https://github.com/OpenframeProject/Openframe-ExtensionExample) repo.
+For more info on extensions, see the [Openframe-Extension](https://github.com/OpenframeProject/Openframe-Extension) repo.
