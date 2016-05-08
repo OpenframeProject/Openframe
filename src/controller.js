@@ -308,7 +308,7 @@ fc.changeArtwork = function() {
             if (old_artwork) {
                 _endArt(old_format.end_command, tokens)
                     .then(function() {
-                        _startArt(new_format.start_command, tokens, new_artwork_conf).then(function() {
+                        _startArt(new_format.start_command.bind(new_format), tokens, new_artwork_conf).then(function() {
                             fc.current_artwork = new_artwork;
                             fc.pubsub.publish('/frame/'+frame.state.id+'/frame_updated', frame.state.id);
                             resolve();
@@ -316,7 +316,7 @@ fc.changeArtwork = function() {
                     })
                     .catch(reject);
             } else {
-                _startArt(new_format.start_command, tokens, new_artwork_conf).then(function() {
+                _startArt(new_format.start_command.bind(new_format), tokens, new_artwork_conf).then(function() {
                     fc.current_artwork = new_artwork;
                     resolve();
                 });
@@ -332,6 +332,7 @@ fc.changeArtwork = function() {
             downloader.downloadFile(new_artwork.url, new_artwork.id + file_name)
                 .then(function(filePath) {
                     tokens['$filepath'] = filePath;
+                    tokens['$url'] = new_artwork.url;
                     swapArt();
                 })
                 .catch(reject);
@@ -395,9 +396,9 @@ fc.extensionApi = {
 function _startArt(_command, tokens, args) {
     debug('startArt');
     if (typeof _command === 'function') {
-        // we should be passing artwork-specific args in here, letting the format
+        // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
-        _command = _command(args);
+        _command = _command(args, tokens);
     }
     var command = _replaceTokens(_command, tokens);
 
