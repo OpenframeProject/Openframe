@@ -145,11 +145,11 @@ function saveAnswers(answers) {
             frame.state.name = answers.frame_name;
         }
         if (answers.autoboot) {
-            // config.ofrc.autoboot = answers.autoboot;
             enableAutoboot();
         } else {
             disableAutoboot();
         }
+        config.ofrc.autoboot = answers.autoboot;
     }
 
     return Promise.all([config.save(), user.save()]);
