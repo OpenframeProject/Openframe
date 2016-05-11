@@ -8,6 +8,8 @@ then
 else
     # start up openframe as a background process
     nohup openframe 2>&1 /dev/null &
-    # change virtual terminal so that we don't see stray output:
-    sudo chvt 4
+    # set the terminal text color to black
+    setterm --foreground black --background black --cursor off --clear all
+    # hide the prompt:
+    export PS1=""
 fi
