@@ -6,10 +6,10 @@ read -t 1 -n 1 key
 then
     echo "no openframe"
 else
-    # start up openframe as a background process
-    nohup openframe 2>&1 /dev/null &
+    # hide the prompt:
+    PS1=""
     # set the terminal text color to black
     setterm --foreground black --background black --cursor off --clear all
-    # hide the prompt:
-    export PS1=""
+    # start up openframe as a background process
+    nohup openframe >/dev/null 2>&1 &
 fi

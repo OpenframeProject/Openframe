@@ -158,7 +158,7 @@ function saveAnswers(answers) {
 function enableAutoboot() {
     debug('----->>> Enable Autoboot');
     disableAutoboot();
-    shell.ShellString('~/.openframe/autoboot.sh\n').toEnd('~/.bashrc');
+    shell.ShellString('source ~/.openframe/autoboot.sh\n').toEnd('~/.bashrc');
 }
 
 function disableAutoboot() {
