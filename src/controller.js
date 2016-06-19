@@ -329,10 +329,12 @@ fc.changeArtwork = function() {
             parsed = url.parse(new_artwork.url);
             file_name = path.basename(parsed.pathname);
 
-            downloader.downloadFile(new_artwork.url, new_artwork.id + file_name)
+            downloader.downloadFile(new_artwork.url, new_artwork.id + file_name, file_name)
                 .then(function(filePath) {
                     tokens['$filepath'] = filePath;
                     tokens['$url'] = new_artwork.url;
+                    tokens['$id'] = new_artwork.id;
+                    tokens['$filename'] = file_name;
                     swapArt();
                 })
                 .catch(reject);
