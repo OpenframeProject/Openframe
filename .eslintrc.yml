@@ -21,7 +21,7 @@ rules:
   space-before-function-paren: [1, never]
   # prefer a single declaration for vars
   one-var:
-    - 1
+    - 0
   space-before-blocks: [1, always]
   # prefer no space between array brackets
   array-bracket-spacing: [1, never]

@@ -306,9 +306,9 @@ fc.changeArtwork = function() {
         function swapArt() {
             debug('swapArt');
             if (old_artwork) {
-                _endArt(old_format.end_command, tokens)
+                _endArt(old_format.end_command, old_artwork)
                     .then(function() {
-                        _startArt(new_format.start_command.bind(new_format), tokens, new_artwork_conf).then(function() {
+                        _startArt(new_format.start_command.bind(new_format), new_artwork).then(function() {
                             fc.current_artwork = new_artwork;
                             fc.pubsub.publish('/frame/'+frame.state.id+'/frame_updated', frame.state.id);
                             resolve();
@@ -331,10 +331,11 @@ fc.changeArtwork = function() {
 
             downloader.downloadFile(new_artwork.url, new_artwork.id + file_name, file_name)
                 .then(function(filePath) {
-                    tokens['$filepath'] = filePath;
                     tokens['$url'] = new_artwork.url;
                     tokens['$id'] = new_artwork.id;
+                    tokens['$filepath'] = filePath;
                     tokens['$filename'] = file_name;
+                    new_artwork.tokens = tokens;
                     swapArt();
                 })
                 .catch(reject);
@@ -342,6 +343,7 @@ fc.changeArtwork = function() {
             debug('DO NOT download');
             // this artwork can be displayed via the url
             tokens['$url'] = new_artwork.url;
+            new_artwork.tokens = tokens;
             swapArt();
         }
 
@@ -395,12 +397,14 @@ fc.extensionApi = {
  * @param  {object} tokens
  * @return {Promise}
  */
-function _startArt(_command, tokens, args) {
+function _startArt(_command, new_artwork) {
     debug('startArt');
     if (typeof _command === 'function') {
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
-        _command = _command(args, tokens);
+        var tokens = new_artwork.tokens || {},
+            config = new_artwork.config || {};
+        _command = _command(config, tokens);
     }
     var command = _replaceTokens(_command, tokens);
 
@@ -418,9 +422,10 @@ function _startArt(_command, tokens, args) {
  * @param  {object} tokens
  * @return {Promise} Resolves when command is complete.
  */
-function _endArt(_command, tokens) {
+function _endArt(_command, old_artwork) {
     debug('endArt');
-    var command = _replaceTokens(_command, tokens);
+    var tokens = old_artwork.tokens || {},
+        command = _replaceTokens(_command, tokens);
     return new Promise(function(resolve, reject) {
         proc_man.exec(command, function(err) {
             if (err) {
