@@ -316,7 +316,7 @@ fc.changeArtwork = function() {
                     })
                     .catch(reject);
             } else {
-                _startArt(new_format.start_command.bind(new_format), tokens, new_artwork_conf).then(function() {
+                _startArt(new_format.start_command.bind(new_format), new_artwork).then(function() {
                     fc.current_artwork = new_artwork;
                     resolve();
                 });
