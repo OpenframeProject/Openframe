@@ -399,13 +399,13 @@ fc.extensionApi = {
  */
 function _startArt(new_format, new_artwork) {
     debug('startArt');
-    var _command = new_format.start_command;
+    var _command = new_format.start_command,
+        tokens = new_artwork.tokens || {};
     if (typeof _command === 'function') {
         _command.bind(new_format)
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
-        var tokens = new_artwork.tokens || {},
-            config = new_artwork.config || {};
+        var config = new_artwork.config || {};
         _command = _command(config, tokens);
     }
     var command = _replaceTokens(_command, tokens);
