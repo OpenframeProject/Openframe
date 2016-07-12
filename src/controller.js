@@ -393,8 +393,8 @@ fc.extensionApi = {
 
 /**
  * Start an artwork.
- * @param  {string} _command
- * @param  {object} tokens
+ * @param  {string} new_format
+ * @param  {object} new_artwork
  * @return {Promise}
  */
 function _startArt(new_format, new_artwork) {
@@ -421,7 +421,7 @@ function _startArt(new_format, new_artwork) {
 /**
  * End a playing artwork.
  * @param  {string} _command
- * @param  {object} tokens
+ * @param  {object} old_artwork
  * @return {Promise} Resolves when command is complete.
  */
 function _endArt(_command, old_artwork) {
