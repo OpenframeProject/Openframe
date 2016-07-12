@@ -308,7 +308,7 @@ fc.changeArtwork = function() {
             if (old_artwork) {
                 _endArt(old_format.end_command, old_artwork)
                     .then(function() {
-                        _startArt(new_format.start_command.bind(new_format), new_artwork).then(function() {
+                        _startArt(new_format, new_artwork).then(function() {
                             fc.current_artwork = new_artwork;
                             fc.pubsub.publish('/frame/'+frame.state.id+'/frame_updated', frame.state.id);
                             resolve();
@@ -316,7 +316,7 @@ fc.changeArtwork = function() {
                     })
                     .catch(reject);
             } else {
-                _startArt(new_format.start_command.bind(new_format), tokens, new_artwork_conf).then(function() {
+                _startArt(new_format, new_artwork).then(function() {
                     fc.current_artwork = new_artwork;
                     resolve();
                 });
@@ -393,13 +393,15 @@ fc.extensionApi = {
 
 /**
  * Start an artwork.
- * @param  {string} _command
- * @param  {object} tokens
+ * @param  {string} new_format
+ * @param  {object} new_artwork
  * @return {Promise}
  */
-function _startArt(_command, new_artwork) {
+function _startArt(new_format, new_artwork) {
     debug('startArt');
+    var _command = new_format.start_command;
     if (typeof _command === 'function') {
+        _command.bind(new_format)
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
         var tokens = new_artwork.tokens || {},
@@ -419,7 +421,7 @@ function _startArt(_command, new_artwork) {
 /**
  * End a playing artwork.
  * @param  {string} _command
- * @param  {object} tokens
+ * @param  {object} old_artwork
  * @return {Promise} Resolves when command is complete.
  */
 function _endArt(_command, old_artwork) {
