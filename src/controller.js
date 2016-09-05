@@ -402,11 +402,11 @@ function _startArt(new_format, new_artwork) {
     var _command = new_format.start_command,
         tokens = new_artwork.tokens || {};
     if (typeof _command === 'function') {
-        _command.bind(new_format)
+        
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
         var config = new_artwork.config || {};
-        _command = _command(config, tokens);
+        _command = _command.call(new_format, config, tokens);
     }
     var command = _replaceTokens(_command, tokens);
 
