@@ -56,7 +56,7 @@ fc.init = function() {
  * - login user
  * - pull latest frame state
  * - install extension package
- * - add extension to frame.plugins
+ * - add extension to frame.extensions
  * - exit with user-facing success/error message
  *
  * @param  {String} extension An npm-style dependency string (package[@version]);
@@ -76,7 +76,7 @@ fc.installExtension = function(extension) {
                         .then(function() {
                             debug('Installed ' + extension + ' successfully, saving frame...');
                             // successfully installed extension locally, add to frame
-                            frame.state.plugins[packageName] = version;
+                            frame.state.extensions[packageName] = version;
                             frame.save()
                                 .then(function() {
                                     console.log('[o]   Extension installed successfully!\n');
@@ -98,7 +98,7 @@ fc.installExtension = function(extension) {
  * - login user
  * - pull latest frame state
  * - uninstall extension package
- * - remove extension to frame.plugins
+ * - remove extension to frame.extensions
  * - exit with user-facing success/error message
  *
  * @param  {String} extension name (npm package);
@@ -114,8 +114,8 @@ fc.uninstallExtension = function(packageName) {
                         .then(function() {
                             debug('Uninstalled ' + packageName + ' successfully, saving frame...');
                             // successfully installed extension locally, add to frame
-                            if (packageName in frame.state.plugins) {
-                                delete frame.state.plugins[packageName];
+                            if (packageName in frame.state.extensions) {
+                                delete frame.state.extensions[packageName];
                             }
                             frame.save()
                                 .then(function(resp) {
@@ -143,7 +143,7 @@ fc.ready = function() {
     debug('ready');
     spinner.stop(true);
 
-    if (frame.state && frame.state._current_artwork) {
+    if (frame.state && frame.state.current_artwork) {
         fc.changeArtwork();
     } else {
         // remove port if it's 80
@@ -224,7 +224,7 @@ fc.connect = function(userId) {
             .then(function() {
                 debug('ready to init...');
                 // initExtensions now always resolves, is never rejected
-                return pm.initExtensions(frame.state.plugins, fc.extensionApi);
+                return pm.initExtensions(frame.state.extensions, fc.extensionApi);
             })
             .then(readyToConnect)
             .catch(function(err) {
@@ -261,10 +261,10 @@ fc.registerNewFrame = function(userId) {
             debug(data.obj);
             frame.state = data.obj;
             frame.persistStateToFile();
-            pm.installExtensions(frame.state.plugins)
+            pm.installExtensions(frame.state.extensions)
                 .then(function() {
                     debug('-----> extensions installed');
-                    pm.initExtensions(frame.state.plugins, fc.extensionApi)
+                    pm.initExtensions(frame.state.extensions, fc.extensionApi)
                         .then(function() {
                             resolve(frame.state);
                         });
@@ -281,13 +281,13 @@ fc.registerNewFrame = function(userId) {
 
 /**
  * Change the artwork being displayed to that which is stored in the
- * Frame's _current_artwork.
+ * Frame's current_artwork.
  */
 fc.changeArtwork = function() {
-    debug('changeArtwork', frame.state._current_artwork);
+    debug('changeArtwork', frame.state.current_artwork);
 
     var old_artwork = fc.current_artwork || undefined,
-        new_artwork = frame.state._current_artwork,
+        new_artwork = frame.state.current_artwork,
         old_format = old_artwork && frame.formats[old_artwork.format],
         new_format = frame.formats[new_artwork.format],
         new_artwork_conf = new_artwork.config || {},
@@ -357,14 +357,14 @@ fc.updateFrame = function() {
     // fetch the latest frame state, and update as needed
     frame.fetch()
         .then(function(new_state) {
-            if (frame.state._current_artwork) {
+            if (frame.state.current_artwork) {
                 fc.changeArtwork()
                     .then(function() {
                         // success changing artwork, do nothing more...
                     })
                     .catch(function() {
-                        // error changing artwork, reset frame.state._current_artwork to true current
-                        frame.state._current_artwork = fc.current_artwork;
+                        // error changing artwork, reset frame.state.current_artwork to true current
+                        frame.state.current_artwork = fc.current_artwork;
                     });
             }
         });
@@ -402,7 +402,7 @@ function _startArt(new_format, new_artwork) {
     var _command = new_format.start_command,
         tokens = new_artwork.tokens || {};
     if (typeof _command === 'function') {
-        
+
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
         var config = new_artwork.config || {};
