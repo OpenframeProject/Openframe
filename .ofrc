@@ -1,7 +1,6 @@
 {
   "network": {
-    "api_protocol": "http",
-    "api_domain": "openframe.io",
-    "api_port": "80"
+    "api_base": "https://api.openframe.io",
+    "app_base": "https://openframe.io"
   }
 }
