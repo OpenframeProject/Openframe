@@ -146,10 +146,7 @@ fc.ready = function() {
     if (frame.state && frame.state.current_artwork) {
         fc.changeArtwork();
     } else {
-        // remove port if it's 80
-        var url_port = config.ofrc.network.api_url.split(':');
-        var url = url_port[2] === '80' ? url_port[0] + url_port[1] : config.ofrc.network.api_url;
-
+        var url = config.ofrc.network.app_base;
 
         // No current artwork... give the user a message:
         console.log('[o]   Connected! You can now push artwork to this frame.');

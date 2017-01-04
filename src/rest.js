@@ -9,7 +9,7 @@ var Swagger = require('swagger-client'),
 rest.client;
 
 rest.init = function() {
-    var api_url = config.ofrc.network.api_url;
+    var api_url = config.ofrc.network.api_base;
 
     return new Promise(function(resolve, reject) {
         new Swagger({
