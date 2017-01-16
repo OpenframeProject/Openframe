@@ -42,7 +42,7 @@ frame.save = function(persist) {
     }
 
     // careful about circular saving... save on the server triggers save locally, triggers save to server, etc...
-    return rest.client.Frame.Frame_upsert({
+    return rest.client.Frame.Frame_upsert__patch_frames({
         data: frame.state,
         id: frame.state.id
     }).catch(debug);
