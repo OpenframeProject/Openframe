@@ -36,7 +36,7 @@ function downloadFile(file_url, file_output_name, cb) {
             file_path = artworkDir + '/' + file_name;
 
         // const ls = spawn('ls', ['-lh', '/usr']);
-        const curl = spawn('curl', ['-o', file_path, file_url]);
+        const curl = spawn('curl', ['-L', '-o', file_path, file_url]);
 
         curl.stdout.on('data', (data) => {
             debug(`stdout: ${data}`);
