@@ -5,10 +5,7 @@
  */
 
 // Dependencies
-const {
-    exec,
-    spawn
-} = require('child_process');
+const { exec, spawn } = require('child_process');
 
 var debug = require('debug')('openframe:downloader'),
     artworkDir = '/tmp';
@@ -29,13 +26,12 @@ function _mkdirp(dir) {
  * @param  {String}   file_url
  * @param  {String}   file_output_name
  */
-function downloadFile(file_url, file_output_name, cb) {
+function downloadFile(file_url, file_output_name) {
     debug('downloading %s', file_url);
     return new Promise(function(resolve, reject) {
         var file_name = file_output_name,
             file_path = artworkDir + '/' + file_name;
 
-        // const ls = spawn('ls', ['-lh', '/usr']);
         const curl = spawn('curl', ['-L', '-o', file_path, file_url]);
 
         curl.stdout.on('data', (data) => {
