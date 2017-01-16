@@ -19,14 +19,15 @@ var util = require('util'),
     user = require('./user'),
     rest = require('./rest'),
     Spinner = require('cli-spinner').Spinner,
-    spinner = new Spinner('[%s]'),
+    spinner = new Spinner('[%s]');
 
     // --> EXPORT
-    fc = module.exports = {};
+let fc = {};
 
 // inherit from EventEmitter
-util.inherits(fc, EventEmitter);
+// util.inherits(fc, EventEmitter);
 
+module.exports = fc;
 /**
  * Initialize the frame controller
  * - login user
