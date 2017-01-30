@@ -4,30 +4,30 @@ var debug = require('debug')('openframe:extensions_manager'),
 
     config = require('./config'),
 
-    pm = module.exports = {};
+    em = module.exports = {};
 
 /**
- * Initialize extensionss module
+ * Initialize extensions module
  *
  * TODO: UNUSED - delete me?
  *
  * @param  {Object} ofrc config object
  */
-pm.init = function() {
+em.init = function() {
     debug('init');
 };
 
 /**
- * Install extensionss.
+ * Install extensions.
  *
- * TODO: since we're just running npm cli via exec(), and reason not to install
- * all extensionss at once instead of one at a time?
+ * TODO: since we're just running npm cli via exec(), any reason not to install
+ * all extensions at once instead of one at a time?
  *
- * @param {object} extensionss A hash of extensionss to install
+ * @param {object} extensions A hash of extensions to install
  * @param {Boolean} force Install the extensions even if it's already installed (skip the check)
  * @return {Promise} A promise resolved with all of the npmi results for each extensions
  */
-pm.installExtensions = function(extensionss, force) {
+em.installExtensions = function(extensions, force) {
     debug('installExtensions');
 
     var promises = [],
@@ -35,9 +35,9 @@ pm.installExtensions = function(extensionss, force) {
         _force = force === true ? true : false;
 
     // install each extensions
-    for (key in extensionss) {
-        if (extensionss.hasOwnProperty(key)) {
-            promises.push(_installExtension(key, extensionss[key], _force));
+    for (key in extensions) {
+        if (extensions.hasOwnProperty(key)) {
+            promises.push(_installExtension(key, extensions[key], _force));
         }
     }
 
@@ -47,20 +47,20 @@ pm.installExtensions = function(extensionss, force) {
 /**
  * Add a new extensions to this frame.
  *
- * Installs the extensions, and if that's successful then adds it to the extensionss list.
+ * Installs the extensions, and if that's successful then adds it to the extensions list.
  *
- * TODO: deal with conflicting versions of extensionss
+ * TODO: deal with conflicting versions of extensions
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for extensionss not in NPM)
+ * @param  {String} version      NPM package version (or repo URL for extensions not in NPM)
  * @return {Promise} A promise resolving with the result from npmi
  */
-pm.addExtension = function(package_name, version) {
+em.addExtension = function(package_name, version) {
     debug('addExtension', package_name, version);
     return new Promise((resolve, reject) => {
-        pm.installExtension(package_name, version)
+        em.installExtension(package_name, version)
             .then(function() {
-                pm.extensionss[package_name] = version;
+                em.extensions[package_name] = version;
                 config.save();
                 resolve(package_name);
             })
@@ -72,20 +72,20 @@ pm.addExtension = function(package_name, version) {
 };
 
 /**
- * Initialize extensionss.
+ * Initialize extensions.
  *
  * @param  {String} extensions
  * @param  {Object} ofExtensionApi An interface to the frame provided to each extensions
  */
-pm.initExtensions = function(extensionss, ofExtensionApi) {
-    debug('initExtensions', extensionss);
+em.initExtensions = function(extensions, ofExtensionApi) {
+    debug('initExtensions', extensions);
     var promises = [],
         key;
 
     return new Promise((resolve, reject) => {
         // add each extensions to package.json
-        for (key in extensionss) {
-            if (extensionss.hasOwnProperty(key)) {
+        for (key in extensions) {
+            if (extensions.hasOwnProperty(key)) {
                 promises.push(_initExtension(key, ofExtensionApi));
             }
         }
@@ -104,7 +104,7 @@ pm.initExtensions = function(extensionss, ofExtensionApi) {
  * @private
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for extensionss not in NPM)
+ * @param  {String} version      NPM package version (or repo URL for extensions not in NPM)
  * @param {Boolean} force Install the extensions even if it's already installed (skip the check)
  * @return {Promise} A promise resolving with the package_name
  */
@@ -140,7 +140,7 @@ function _installExtension(package_name, version, force) {
 }
 
 // public exposure
-pm.installExtension = _installExtension;
+em.installExtension = _installExtension;
 
 /**
  * Removes a single extensions by removing it from the npm package.
@@ -160,13 +160,13 @@ function _removeExtension(package_name) {
 }
 
 // public exposure
-pm.uninstallExtension = _removeExtension;
+em.uninstallExtension = _removeExtension;
 
 /**
  * Check whether a extension is already installed.
  *
  * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for extensionss not in NPM)
+ * @param  {String} version      NPM package version (or repo URL for extensions not in NPM)
  * @return {Promise} A promise resolving with either true (extensions installed) or false (extensions not installed)
  */
 function _checkExtension(package_name, version) {
@@ -193,7 +193,7 @@ function _checkExtension(package_name, version) {
  * If the extensions has an install.sh file, execute it. Then call the extensions's init method
  * passing in a reference to the frame controller.
  *
- * TODO: initialize extensionss with sandboxed API?
+ * TODO: initialize extensions with sandboxed API?
  * - addFormat
  * - installDeps (?)
  *

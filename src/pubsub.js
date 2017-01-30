@@ -1,5 +1,3 @@
-'use strict';
-
 var faye = require('faye'),
     config = require('./config'),
     frame = require('./frame'),

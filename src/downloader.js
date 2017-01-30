@@ -1,14 +1,14 @@
-'use strict';
+// 'use strict';
 
 /**
  * A small utility for downloading files.
  */
 
 // Dependencies
-var exec = require('child_process').exec,
-    debug = require('debug')('openframe:downloader'),
-    artworkDir = '/tmp',
-    http = require('http-request');
+const { exec, spawn } = require('child_process');
+
+var debug = require('debug')('openframe:downloader'),
+    artworkDir = '/tmp';
 
 // unused at present
 function _mkdirp(dir) {
@@ -26,23 +26,29 @@ function _mkdirp(dir) {
  * @param  {String}   file_url
  * @param  {String}   file_output_name
  */
-function downloadFile(file_url, file_output_name, cb) {
+function downloadFile(file_url, file_output_name) {
+    debug('downloading %s', file_url);
     return new Promise(function(resolve, reject) {
         var file_name = file_output_name,
             file_path = artworkDir + '/' + file_name;
 
-        // simplified download using http-request module
-        http.get({
-            url: file_url,
-            progress: function (current, total) {
-                debug('downloaded %d bytes from %d', current, total);
+        const curl = spawn('curl', ['-L', '-o', file_path, file_url]);
+
+        curl.stdout.on('data', (data) => {
+            debug(`stdout: ${data}`);
+        });
+
+        curl.stderr.on('data', (data) => {
+            debug(`stderr: ${data}`);
+        });
+
+        curl.on('close', (code) => {
+            debug(`child process exited with code ${code}`);
+            if (code !== 0) {
+                reject('Download failed');
+            } else {
+                resolve(file_path);
             }
-        }, file_path, function (err, res) {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(res.file);
         });
     });
 
