@@ -1,6 +1,6 @@
 {
   "name": "openframe",
-  "version": "0.3.11",
+  "version": "0.4.0",
   "description": "Openframe controller process which runs on the machine controlling the frame.",
   "main": "index.js",
   "scripts": {
