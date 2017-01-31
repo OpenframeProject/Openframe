@@ -36,6 +36,10 @@ if [ $os == "Linux" ]; then
         sudo sed -i -r 's/BLANK_TIME=[0-9]+/BLANK_TIME=0/' /etc/kbd/config
         sudo sed -i -r 's/POWERDOWN_TIME=[0-9]+/POWERDOWN_TIME=0/' /etc/kbd/config
 
+        # use node 6.9
+        nvm install 6.9
+        nvm alias default 6.9
+
         # sudo reboot
     else
         # Non-arm7 Debian...
