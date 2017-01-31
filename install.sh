@@ -37,6 +37,7 @@ if [ $os == "Linux" ]; then
         sudo sed -i -r 's/POWERDOWN_TIME=[0-9]+/POWERDOWN_TIME=0/' /etc/kbd/config
 
         # use node 6.9
+        . ~/.nvm/nvm.sh
         nvm install 6.9
         nvm alias default 6.9
 
