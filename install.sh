@@ -36,12 +36,17 @@ if [ $os == "Linux" ]; then
         sudo sed -i -r 's/BLANK_TIME=[0-9]+/BLANK_TIME=0/' /etc/kbd/config
         sudo sed -i -r 's/POWERDOWN_TIME=[0-9]+/POWERDOWN_TIME=0/' /etc/kbd/config
 
-        # use node 6.9
+        # update from node 4.x to node 6.9
         . ~/.nvm/nvm.sh
         nvm install 6.9
+        nvm reinstall-packages 4
         nvm alias default 6.9
 
-        # sudo reboot
+        echo "Openframe updated, please run:"
+        echo ""
+        echo "source ~/.bashrc"
+        echo ""
+        echo ""
     else
         # Non-arm7 Debian...
         echo "non armv7l"
