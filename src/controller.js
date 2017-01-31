@@ -3,11 +3,9 @@
  */
 
 // app dependencies
-var util = require('util'),
-    url = require('url'),
+var url = require('url'),
     path = require('path'),
     debug = require('debug')('openframe:frame_controller'),
-    EventEmitter = require('events').EventEmitter,
     Swagger = require('swagger-client'),
 
     downloader = require('./downloader'),
@@ -21,13 +19,10 @@ var util = require('util'),
     Spinner = require('cli-spinner').Spinner,
     spinner = new Spinner('[%s]');
 
-    // --> EXPORT
-let fc = {};
-
-// inherit from EventEmitter
-// util.inherits(fc, EventEmitter);
+var fc = {};
 
 module.exports = fc;
+
 /**
  * Initialize the frame controller
  * - login user
