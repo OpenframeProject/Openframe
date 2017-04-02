@@ -42,7 +42,8 @@ frame.save = function(persist) {
     }
 
     // careful about circular saving... save on the server triggers save locally, triggers save to server, etc...
-    return rest.client.Frame.Frame_upsert_patch_frames({
+    // debug('rest.client.Frame', rest.client.Frame);
+    return rest.client.Frame.Frame_prototype_patchAttributes({
         data: frame.state,
         id: frame.state.id
     }).catch(debug);
@@ -69,9 +70,11 @@ frame.fetch = function() {
 
 
             }).catch(function(err) {
+                debug(err);
                 reject();
             });
         } else {
+            debug('No valid frame.state present');
             reject();
         }
     });
