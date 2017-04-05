@@ -71,8 +71,13 @@ fc.installExtension = function(extension) {
                     pm.installExtension(packageName, version, true)
                         .then(function() {
                             debug('Installed ' + extension + ' successfully, saving frame...');
+                            var ext = require(packageName);
                             // successfully installed extension locally, add to frame
                             frame.state.extensions[packageName] = version;
+                            frame.state.settings = frame.state.settings || {};
+                            frame.state.settings[packageName] = ext.props.settings || {};
+                            debug('EXT', ext);
+                            debug('SETTINGS', frame.state.settings);
                             frame.save()
                                 .then(function() {
                                     console.log('[o]   Extension installed successfully!\n');
