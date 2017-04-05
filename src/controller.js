@@ -118,6 +118,9 @@ fc.uninstallExtension = function(packageName) {
                             if (packageName in frame.state.extensions) {
                                 delete frame.state.extensions[packageName];
                             }
+                            if (packageName in frame.state.settings) {
+                                delete frame.state.settings[packageName];
+                            }
                             frame.save()
                                 .then(function(resp) {
                                     // debug(resp);
