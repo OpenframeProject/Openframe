@@ -36,7 +36,7 @@ ps.init = function(fc) {
     // handlers for pubsub connection events
     ps.client.on('transport:down', function() {
         // the pubsub client is offline
-        debug('pubsub client dsconnected');
+        debug('pubsub client disconnected');
     });
 
     ps.client.on('transport:up', function() {
