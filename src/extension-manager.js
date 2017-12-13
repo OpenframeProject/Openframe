@@ -105,14 +105,14 @@ function _installExtension(package_name, version, force) {
 ext_man.installExtension = _installExtension;
 
 /**
- * Rext_manoves a single extensions by rext_manoving it from the npm package.
+ * Removes a single extensions by removing it from the npm package.
  *
  * @param  {String} package_name NPM package name
  * @return {Promise} A promise resolving with the package_name
  */
-function _rext_manoveExtension(package_name) {
-    debug('rext_manoveExtension', package_name);
-    var cmd = 'npm rext_manove -g ' + package_name;
+function _removeExtension(package_name) {
+    debug('removeExtension', package_name);
+    var cmd = 'npm remove -g ' + package_name;
     cmd += ' --save';
     return new Promise((resolve, reject) => {
         _runNpmCommand(cmd).then(function() {
@@ -122,7 +122,7 @@ function _rext_manoveExtension(package_name) {
 }
 
 // public exposure
-ext_man.uninstallExtension = _rext_manoveExtension;
+ext_man.uninstallExtension = _removeExtension;
 
 /**
  * Check whether a extension is already installed.
@@ -176,7 +176,7 @@ function _initExtension(extensions_name, ofExtensionApi) {
             extensions._init(ofExtensionApi);
             resolve(extensions);
         } catch (e) {
-            // problext_man trying to require extensions
+            // problem trying to require extensions
             debug('ERROR - ', e);
             reject(e);
         }
