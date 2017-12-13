@@ -1,21 +1,17 @@
 var assert = require('assert'),
     sinon = require('sinon'),
     npm = require('npm'),
-    pm = require('../plugin-manager');
+    ext_man = require('../src/extension-manager');
 
-var config = {
-    ofrc: {
-        frame: {
-            plugins: {
-                "lodash": "4.0.0"
-            }
+var frame = {
+    state: {
+        extensions: {
+            "lodash": "4.0.0"
         }
-    },
-    save: sinon.spy()
-};
+    }
+}
 
 before(function() {
-    pm.init(config);
 });
 
 afterEach(function(done) {
@@ -37,17 +33,10 @@ afterEach(function(done) {
     });
 });
 
-describe('init', function() {
-    // it('should store a local reference to the plugin list', function(done) {
-    //     assert.equal(pm.plugins["lodash"], "4.0.0");
-    //     done();
-    // });
-});
-
-describe('installPlugin', function() {
+describe('installExtension', function() {
     this.timeout(0);
     it('should install an npm package with a version specified', function(done) {
-        pm.installPlugin("lodash", "4.0.0")
+        ext_man.installExtension("lodash", "4.0.0")
             .then(function() {
                 npm.load({
                     logLevel: 'silent'
@@ -70,7 +59,7 @@ describe('installPlugin', function() {
     });
 
     it('should install an npm package without a version specified', function(done) {
-        pm.installPlugin("lodash")
+        ext_man.installExtension("lodash")
             .then(function() {
                 npm.load({
                     logLevel: 'silent'
@@ -94,7 +83,7 @@ describe('installPlugin', function() {
 
     it('should fail to install an npm package that does not exist', function(done) {
 
-        pm.installPlugin("openframe-this-is-not-real")
+        ext_man.installExtension("openframe-this-is-not-real")
             .catch(function(err) {
                 done();
             });
@@ -103,10 +92,10 @@ describe('installPlugin', function() {
 });
 
 
-describe('installPlugins', function() {
+describe('installExtensions', function() {
     this.timeout(0);
-    it('should install all plugins passed in an npm dependency object', function(done) {
-        pm.installPlugins(config)
+    it('should install all extensions passed in an npm dependency object', function(done) {
+        ext_man.installExtensions(frame.state.extensions)
             .then(function() {
                 npm.load({
                     logLevel: 'silent'
@@ -124,42 +113,6 @@ describe('installPlugins', function() {
                     });
                 });
 
-            });
-    });
-});
-
-describe('addPlugin', function() {
-    this.timeout(0);
-    it('should add and install a new plugin', function(done) {
-        pm.addPlugin("lodash")
-            .then(function() {
-                npm.load({
-                    logLevel: 'silent'
-                }, function(err) {
-                    if (err) {
-                        console.error(err);
-                        return;
-                    }
-                    npm.commands.ls(['lodash'], function(err, data) {
-                        if (err) {
-                            console.error(err);
-                        }
-                        // openframe-keystroke found
-                        assert.equal(data._found, 1);
-
-                        // check that the config was saved
-                        assert(config.save.called);
-                        done();
-                    });
-                });
-
-            });
-    });
-
-    it('should fail to add and install a non existent plugin', function(done) {
-        pm.addPlugin("openframe-this-is-not-real")
-            .catch(function(err) {
-                done();
             });
     });
 });

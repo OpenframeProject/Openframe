@@ -12,7 +12,7 @@ The block diagram below represents a proposed architecture for the Openframe pla
 
 * `controller.js` - manages the actions around controlling the frame (changing artwork, updating settings, etc.)
 * `process-manager.js` - manages starting and stopping processes for displaying artworks
-* `plugin-manager.js` - manages installing and initializing plugins (aka extensions)
+* `extensions-manager.js` - manages installing and initializing extensions (aka plugins)
 * `frame.js` - a wrapper for the Frame model, which gets persisted to
 * `user.js` - a wrapper for the User model
 * `pubsub.js` - creates and manages connection to global event system
