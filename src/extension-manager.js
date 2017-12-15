@@ -4,18 +4,7 @@ var debug = require('debug')('openframe:extensions_manager'),
 
     config = require('./config'),
 
-    em = module.exports = {};
-
-/**
- * Initialize extensions module
- *
- * TODO: UNUSED - delete me?
- *
- * @param  {Object} ofrc config object
- */
-em.init = function() {
-    debug('init');
-};
+    ext_man = module.exports = {};
 
 /**
  * Install extensions.
@@ -27,7 +16,7 @@ em.init = function() {
  * @param {Boolean} force Install the extensions even if it's already installed (skip the check)
  * @return {Promise} A promise resolved with all of the npmi results for each extensions
  */
-em.installExtensions = function(extensions, force) {
+ext_man.installExtensions = function(extensions, force) {
     debug('installExtensions');
 
     var promises = [],
@@ -45,39 +34,12 @@ em.installExtensions = function(extensions, force) {
 };
 
 /**
- * Add a new extensions to this frame.
- *
- * Installs the extensions, and if that's successful then adds it to the extensions list.
- *
- * TODO: deal with conflicting versions of extensions
- *
- * @param  {String} package_name NPM package name
- * @param  {String} version      NPM package version (or repo URL for extensions not in NPM)
- * @return {Promise} A promise resolving with the result from npmi
- */
-em.addExtension = function(package_name, version) {
-    debug('addExtension', package_name, version);
-    return new Promise((resolve, reject) => {
-        em.installExtension(package_name, version)
-            .then(function() {
-                em.extensions[package_name] = version;
-                config.save();
-                resolve(package_name);
-            })
-            .catch(function(err) {
-                debug(err);
-                reject(err);
-            });
-    });
-};
-
-/**
  * Initialize extensions.
  *
  * @param  {String} extensions
  * @param  {Object} ofExtensionApi An interface to the frame provided to each extensions
  */
-em.initExtensions = function(extensions, ofExtensionApi) {
+ext_man.initExtensions = function(extensions, ofExtensionApi) {
     debug('initExtensions', extensions);
     var promises = [],
         key;
@@ -97,7 +59,7 @@ em.initExtensions = function(extensions, ofExtensionApi) {
 };
 
 /**
- * Install a single extensions via NPM
+ * Install a single extension via NPM
  *
  * Uses machine's npm as a child_process so that we don't have to depend on the npm package.
  *
@@ -105,7 +67,7 @@ em.initExtensions = function(extensions, ofExtensionApi) {
  *
  * @param  {String} package_name NPM package name
  * @param  {String} version      NPM package version (or repo URL for extensions not in NPM)
- * @param {Boolean} force Install the extensions even if it's already installed (skip the check)
+ * @param {Boolean} force Install the extension even if it's already installed (skip the check)
  * @return {Promise} A promise resolving with the package_name
  */
 function _installExtension(package_name, version, force) {
@@ -140,7 +102,7 @@ function _installExtension(package_name, version, force) {
 }
 
 // public exposure
-em.installExtension = _installExtension;
+ext_man.installExtension = _installExtension;
 
 /**
  * Removes a single extensions by removing it from the npm package.
@@ -160,7 +122,7 @@ function _removeExtension(package_name) {
 }
 
 // public exposure
-em.uninstallExtension = _removeExtension;
+ext_man.uninstallExtension = _removeExtension;
 
 /**
  * Check whether a extension is already installed.

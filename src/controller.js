@@ -11,7 +11,7 @@ var url = require('url'),
     downloader = require('./downloader'),
     pubsub = require('./pubsub'),
     proc_man = require('./process-manager'),
-    pm = require('./extension-manager'),
+    ext_man = require('./extension-manager'),
     config = require('./config'),
     frame = require('./frame'),
     user = require('./user'),
@@ -68,7 +68,7 @@ fc.installExtension = function(extension) {
         .then(function() {
             frame.fetch()
                 .then(function() {
-                    pm.installExtension(packageName, version, true)
+                    ext_man.installExtension(packageName, version, true)
                         .then(function() {
                             debug('Installed ' + extension + ' successfully, saving frame...');
                             var ext = require(packageName);
@@ -111,7 +111,7 @@ fc.uninstallExtension = function(packageName) {
         .then(function() {
             frame.fetch()
                 .then(function() {
-                    pm.uninstallExtension(packageName)
+                    ext_man.uninstallExtension(packageName)
                         .then(function() {
                             debug('Uninstalled ' + packageName + ' successfully, saving frame...');
                             // successfully installed extension locally, add to frame
@@ -225,7 +225,7 @@ fc.connect = function(userId) {
             .then(function() {
                 debug('ready to init...');
                 // initExtensions now always resolves, is never rejected
-                return pm.initExtensions(frame.state.extensions, fc.extensionApi);
+                return ext_man.initExtensions(frame.state.extensions, fc.extensionApi);
             })
             .then(readyToConnect)
             .catch(function(err) {
@@ -262,10 +262,10 @@ fc.registerNewFrame = function(userId) {
             debug(data.obj);
             frame.state = data.obj;
             frame.persistStateToFile();
-            pm.installExtensions(frame.state.extensions)
+            ext_man.installExtensions(frame.state.extensions)
                 .then(function() {
                     debug('-----> extensions installed');
-                    pm.initExtensions(frame.state.extensions, fc.extensionApi)
+                    ext_man.initExtensions(frame.state.extensions, fc.extensionApi)
                         .then(function() {
                             resolve(frame.state);
                         });
