@@ -9,7 +9,7 @@ else
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
         echo "logged in via SSH"
     else 
-        echo "logged in not via SSH"
+        # logged in locally (not via SSH)
       
         # hide the prompt:
         PS1=""
