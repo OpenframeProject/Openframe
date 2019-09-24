@@ -406,8 +406,8 @@ function _startArt(new_format, new_artwork) {
 
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
-        var settings = new_artwork.settings || {};
-        _command = _command.call(new_format, settings, tokens);
+        var options = new_artwork.options || {};
+        _command = _command.call(new_format, options, tokens);
     }
     var command = _replaceTokens(_command, tokens);
 
@@ -433,8 +433,8 @@ function _endArt(old_format, old_artwork) {
 
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
-        var settings = old_artwork.settings || {};
-        _command = _command.call(old_format, settings, tokens);
+        var options = old_artwork.options || {};
+        _command = _command.call(old_format, options, tokens);
     }
     var command = _replaceTokens(_command, tokens);
     
