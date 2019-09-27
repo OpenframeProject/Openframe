@@ -6,7 +6,6 @@ npm-debug.log
 coverage/*
 .frame.json
 .user.json
-.DS_Store
 
 ### macOS ###
 # General
