@@ -298,11 +298,18 @@ fc.changeArtwork = function() {
     debug('details', old_artwork, old_format, new_artwork, new_format);
 
     return new Promise(function(resolve, reject) {
+
+        //artwork extension not installed, don't update
+        if (!new_format) {
+            console.error('\x1b[31m', 'The artwork format is not installed:', new_artwork.format,'\n');
+            return reject();
+        }
+
         // old artwork is new artwork, don't update.
         if (old_artwork && JSON.stringify(old_artwork) === JSON.stringify(new_artwork)) {
             debug('new artwork same as current', old_artwork.id, new_artwork.id);
             return reject();
-        }
+        }        
 
         function swapArt() {
             debug('swapArt');
