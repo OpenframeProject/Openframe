@@ -415,15 +415,28 @@ function _startArt(new_format, new_artwork) {
         // construct the command dynamically...
         var options = new_artwork.options || {};
         _command = _command.call(new_format, options, tokens);
+        
+        Promise.resolve(_command).then(function(value) {
+          _command = value
+          
+          return replaceTokensAndStart()
+        })
+        
     }
-    var command = _replaceTokens(_command, tokens);
+    else {
+      return replaceTokensAndStart()
+    } 
+    
+    function replaceTokensAndStart() {
+      var command = _replaceTokens(_command, tokens);
 
-    return new Promise(function(resolve, reject) {
-        // TODO: proc_man.startProcess doesn't return Promise
-        // can we know when the process is ready without ipc?
-        proc_man.startProcess(command);
-        resolve();
-    });
+      return new Promise(function(resolve, reject) {
+          // TODO: proc_man.startProcess doesn't return Promise
+          // can we know when the process is ready without ipc?
+          proc_man.startProcess(command);
+          resolve();
+      }); 
+    }
 }
 
 /**
