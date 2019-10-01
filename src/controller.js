@@ -416,6 +416,7 @@ function _startArt(new_format, new_artwork) {
         var options = new_artwork.options || {};
         _command = _command.call(new_format, options, tokens);
         
+        // start_command of the extension can return either Promise or a value, both is okay.
         return Promise.resolve(_command).then(function(value) {
           return new Promise(function(resolve, reject) {
             _command = value
