@@ -416,10 +416,12 @@ function _startArt(new_format, new_artwork) {
         var options = new_artwork.options || {};
         _command = _command.call(new_format, options, tokens);
         
-        Promise.resolve(_command).then(function(value) {
-          _command = value
-          
-          return replaceTokensAndStart()
+        return Promise.resolve(_command).then(function(value) {
+          return new Promise(function(resolve, reject) {
+            _command = value
+            
+            resolve(replaceTokensAndStart())
+          })
         })
         
     }
