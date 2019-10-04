@@ -1,6 +1,7 @@
 var debug = require('debug')('openframe:extensions_manager'),
     execFile = require('child_process').execFile,
     exec = require('child_process').exec,
+    requireg = require('requireg'),
 
     config = require('./config'),
 
@@ -172,7 +173,7 @@ function _initExtension(extensions_name, ofExtensionApi) {
     var extensions;
     return new Promise((resolve, reject) => {
         try {
-            extensions = require(extensions_name);
+            extensions = requireg(extensions_name, true); // Make sure to check for installed extensions globally and skip local packages
             extensions._init(ofExtensionApi);
             resolve(extensions);
         } catch (e) {

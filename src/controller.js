@@ -109,8 +109,7 @@ fc.installExtension = function(extension) {
                       ext_man.installExtension(npmRepo, version, true)
                           .then(function() {
                               debug('Installed ' + extension + ' successfully, saving frame...');
-                              // Make sure to check for installed extensions globally and skip local packages 
-                              var ext = requireg(packageName, true);
+                              var ext = requireg(packageName, true); // Make sure to check for installed extensions globally and skip local packages 
                               // successfully installed extension locally, add to frame
                               frame.state.extensions[packageName] = version;
                               frame.state.settings = frame.state.settings || {};
