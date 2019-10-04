@@ -111,7 +111,7 @@ fc.installExtension = function(extension) {
                               debug('Installed ' + extension + ' successfully, saving frame...');
                               var ext = requireg(packageName, true); // Make sure to check for installed extensions globally and skip local packages 
                               // successfully installed extension locally, add to frame
-                              frame.state.extensions[packageName] = version;
+                              frame.state.extensions[packageName] = version || "*";
                               frame.state.settings = frame.state.settings || {};
                               frame.state.settings[packageName] = ext.props.settings || {};
                               debug('EXT', ext);
