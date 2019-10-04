@@ -71,9 +71,12 @@ fc.installExtension = function(extension) {
         
     if (extension.startsWith('github:')) {
     	debug('github extension')    
-      var repoPath = extension.replace(/^(github:)/,'');
-      var packageJsonURL = 'https://raw.githubusercontent.com/' + repoPath + '/master/package.json';
-    	
+      var repoPath = extension.replace(/^(github:)/,'').split('#')[0];
+      var branch = extension.split('#')[1] || 'master';
+      debug('branch', branch);
+      var packageJsonURL = 'https://raw.githubusercontent.com/' + repoPath + '/' + branch + '/package.json';
+    	debug('packageJsonURL', packageJsonURL);
+      
       var result = '';
 
       https.get(packageJsonURL, function(response) {
