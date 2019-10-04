@@ -18,7 +18,8 @@ var url = require('url'),
     rest = require('./rest'),
     Spinner = require('cli-spinner').Spinner,
     spinner = new Spinner('[%s]'),
-    https = require('https');
+    https = require('https'),
+    requireg = require('requireg');
 
 var fc = {};
 
@@ -108,7 +109,8 @@ fc.installExtension = function(extension) {
                       ext_man.installExtension(npmRepo, version, true)
                           .then(function() {
                               debug('Installed ' + extension + ' successfully, saving frame...');
-                              var ext = require(packageName);
+                              // Make sure to check for installed extensions globally and skip local packages 
+                              var ext = requireg(packageName, true);
                               // successfully installed extension locally, add to frame
                               frame.state.extensions[packageName] = version;
                               frame.state.settings = frame.state.settings || {};
