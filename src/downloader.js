@@ -10,16 +10,6 @@ const { exec, spawn } = require('child_process');
 var debug = require('debug')('openframe:downloader'),
     artworkDir = '/tmp';
 
-// unused at present
-function _mkdirp(dir) {
-    var mkdir = 'mkdir -p ' + dir;
-    exec(mkdir, function(err) {
-        if (err) {
-            throw err;
-        }
-    });
-}
-
 /**
  * Download a file using HTTP get.
  *
