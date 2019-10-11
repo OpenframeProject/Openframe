@@ -17,6 +17,8 @@ const fs = require('fs'),
   humanizeDuration = require('humanize-duration');  
 
 const artworkDir = '/tmp';
+
+let artworkRequest, finished = false
     
 /**
  * Download a file using HTTP get.
@@ -26,9 +28,10 @@ const artworkDir = '/tmp';
  */
 function downloadFile(file_url, file_output_name) {
   debug('downloading %s', file_url);
+  
   return new Promise(function(resolve, reject) {
     var file_name = file_output_name,
-        file_path = artworkDir + '/' + file_name;
+        file_path = artworkDir + '/' + file_name;    
 
     mkdirp(artworkDir, function (err) {
         if (err) {
@@ -37,12 +40,17 @@ function downloadFile(file_url, file_output_name) {
         }
     });
 
-    progress(request({ 
+    // debug('finished',finished)
+    if (artworkRequest && !finished) artworkRequest.abort()
+    finished = false 
+    artworkRequest = request({ 
       url: file_url,
       headers: {
         'User-Agent': 'request'
       }
-    }), {
+    })
+
+    progress(artworkRequest, {
       throttle : 500
     })
     .on('response', function(response) {
@@ -59,6 +67,10 @@ function downloadFile(file_url, file_output_name) {
       console.error(err)
       reject()
     })
+    .on('abort', function() {
+      debug("Aborted downloading artwork")
+      reject()
+    })
     .on('progress', function (state) {
         if (debug.enabled) logSingleLine((state.percent*100).toFixed(2) + '% of ' + prettyBytes(state.size.total)+ ' – ' + humanizeDuration(state.time.remaining * 1000, { round: true }) + ' remaining – ' + (state.speed != null ? prettyBytes(state.speed) : '?') + '/s')
     })
@@ -69,6 +81,7 @@ function downloadFile(file_url, file_output_name) {
     }))
     .on('finish', function() {
       debug('Artwork downloaded')
+      finished = true
             
       return resolve(file_path);
     });
