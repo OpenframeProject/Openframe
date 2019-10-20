@@ -66,7 +66,7 @@ fc.installExtension = function(extension) {
 
     var extensionParts = extension.split('@'),
         packageName = extensionParts[0],
-        version = extensionParts.length > 1 ? extensionParts[1] : '*',
+        version = extensionParts.length > 1 ? extensionParts[1] : undefined,
         npmRepo;
         
     if (extension.startsWith('github:')) {
@@ -95,6 +95,20 @@ fc.installExtension = function(extension) {
     	  debug(e);
     	});	
   	} 
+    else if (extension.startsWith('file:')) {
+      debug('extension on local filesystem')    
+
+      var repoPath = extension.replace(/^(file:)/,'')
+      
+      var packageJson = require(path.join(repoPath,'package.json'));
+      
+      version = undefined;
+      packageName = packageJson.name;
+      npmRepo = extension
+      
+      _install();
+    
+    } 
     else {
       debug('regular extension')  
       npmRepo = packageName  
