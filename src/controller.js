@@ -354,16 +354,23 @@ fc.changeArtwork = function() {
     debug('details', old_artwork, old_format, new_artwork, new_format);
 
     return new Promise(function(resolve, reject) {
+
+        //artwork extension not installed, don't update
+        if (!new_format) {
+            console.error('\x1b[31m', 'The artwork format is not installed:', new_artwork.format,'\n');
+            return reject();
+        }
+
         // old artwork is new artwork, don't update.
         if (old_artwork && JSON.stringify(old_artwork) === JSON.stringify(new_artwork)) {
             debug('new artwork same as current', old_artwork.id, new_artwork.id);
             return reject();
-        }
+        }        
 
         function swapArt() {
             debug('swapArt');
             if (old_artwork) {
-                _endArt(old_format.end_command, old_artwork)
+                _endArt(old_format, old_artwork)
                     .then(function() {
                         _startArt(new_format, new_artwork).then(function() {
                             fc.current_artwork = new_artwork;
@@ -462,8 +469,8 @@ function _startArt(new_format, new_artwork) {
 
         // we're passing artwork-specific args and tokens here, letting the format
         // construct the command dynamically...
-        var settings = new_artwork.settings || {};
-        _command = _command.call(new_format, settings, tokens);
+        var options = new_artwork.options || {};
+        _command = _command.call(new_format, options, tokens);
     }
     var command = _replaceTokens(_command, tokens);
 
@@ -477,14 +484,23 @@ function _startArt(new_format, new_artwork) {
 
 /**
  * End a playing artwork.
- * @param  {string} _command
+ * @param  {string} old_format
  * @param  {object} old_artwork
  * @return {Promise} Resolves when command is complete.
  */
-function _endArt(_command, old_artwork) {
+function _endArt(old_format, old_artwork) {
     debug('endArt');
-    var tokens = old_artwork.tokens || {},
-        command = _replaceTokens(_command, tokens);
+    var _command = old_format.end_command,
+        tokens = old_artwork.tokens || {};
+    if (typeof _command === 'function') {
+
+        // we're passing artwork-specific args and tokens here, letting the format
+        // construct the command dynamically...
+        var options = old_artwork.options || {};
+        _command = _command.call(old_format, options, tokens);
+    }
+    var command = _replaceTokens(_command, tokens);
+    
     return new Promise(function(resolve, reject) {
         proc_man.exec(command, function(err) {
             if (err) {
