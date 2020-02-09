@@ -17,7 +17,9 @@ var url = require('url'),
     user = require('./user'),
     rest = require('./rest'),
     Spinner = require('cli-spinner').Spinner,
-    spinner = new Spinner('[%s]');
+    spinner = new Spinner('[%s]'),
+    https = require('https'),
+    requireg = require('requireg');
 
 var fc = {};
 
@@ -59,39 +61,93 @@ fc.init = function() {
  */
 fc.installExtension = function(extension) {
     debug('installExtension', extension);
+    
+    var _this = this;
 
     var extensionParts = extension.split('@'),
         packageName = extensionParts[0],
-        version = extensionParts.length > 1 ? extensionParts[1] : '*';
+        version = extensionParts.length > 1 ? extensionParts[1] : undefined,
+        npmRepo;
+        
+    if (extension.startsWith('github:')) {
+    	debug('github extension')    
+      var repoPath = extension.replace(/^(github:)/,'').split('#')[0];
+      var branch = extension.split('#')[1] || 'master';
+      debug('branch', branch);
+      var packageJsonURL = 'https://raw.githubusercontent.com/' + repoPath + '/' + branch + '/package.json';
+    	debug('packageJsonURL', packageJsonURL);
+      
+      var result = '';
 
-    this.login()
-        .then(function() {
-            frame.fetch()
-                .then(function() {
-                    ext_man.installExtension(packageName, version, true)
-                        .then(function() {
-                            debug('Installed ' + extension + ' successfully, saving frame...');
-                            var ext = require(packageName);
-                            // successfully installed extension locally, add to frame
-                            frame.state.extensions[packageName] = version;
-                            frame.state.settings = frame.state.settings || {};
-                            frame.state.settings[packageName] = ext.props.settings || {};
-                            debug('EXT', ext);
-                            debug('SETTINGS', frame.state.settings);
-                            frame.save()
-                                .then(function() {
-                                    console.log('[o]   Extension installed successfully!\n');
-                                });
-                        });
-                })
-                .catch(function(err) {
-                    if (err.status === 404) {
-                        console.log('[o]   ERROR: This frame has been set up perviously, but is not attached this user.');
-                        console.log('\n');
-                        console.log('To reset the frame entirely, restart using: openframe -r');
-                    }
-                });
-        });
+      https.get(packageJsonURL, function(response) {
+    		if (response.statusCode != 200) debug('Couldn\'t download package.json from Github')	
+    			
+        response.on('data',d => result += d).on('end',() => {
+    			var packageJson = JSON.parse(result);
+    			
+    			version = undefined;
+    		  packageName = packageJson.name;
+          npmRepo = extension
+    			
+    			_install();
+    		});
+      }).on('error', (e) => {
+    	  debug(e);
+    	});	
+  	} 
+    else if (extension.startsWith('file:')) {
+      debug('extension on local filesystem')    
+
+      var repoPath = extension.replace(/^(file:)/,'')
+      
+      var packageJson = require(path.join(repoPath,'package.json'));
+      
+      version = undefined;
+      packageName = packageJson.name;
+      npmRepo = extension
+      
+      _install();
+    
+    } 
+    else {
+      debug('regular extension')  
+      npmRepo = packageName  
+    	_install();
+    }
+    
+    function _install() {
+    	debug('packageName',packageName)
+    	debug('version', version)
+
+      _this.login()
+          .then(function() {
+              frame.fetch()
+                  .then(function() {
+                      ext_man.installExtension(npmRepo, version, true)
+                          .then(function() {
+                              debug('Installed ' + extension + ' successfully, saving frame...');
+                              var ext = requireg(packageName, true); // Make sure to check for installed extensions globally and skip local packages 
+                              // successfully installed extension locally, add to frame
+                              frame.state.extensions[packageName] = version || "*";
+                              frame.state.settings = frame.state.settings || {};
+                              frame.state.settings[packageName] = ext.props.settings || {};
+                              debug('EXT', ext);
+                              debug('SETTINGS', frame.state.settings);
+                              frame.save()
+                                  .then(function() {
+                                      console.log('[o]   Extension installed successfully!\n');
+                                  });
+                          });
+                  })
+                  .catch(function(err) {
+                      if (err.status === 404) {
+                          console.log('[o]   ERROR: This frame has been set up perviously, but is not attached this user.');
+                          console.log('\n');
+                          console.log('To reset the frame entirely, restart using: openframe -r');
+                      }
+                  });
+          });
+    };
 };
 
 /**
@@ -415,15 +471,31 @@ function _startArt(new_format, new_artwork) {
         // construct the command dynamically...
         var options = new_artwork.options || {};
         _command = _command.call(new_format, options, tokens);
+        
+        // start_command of the extension can return either Promise or a value, both is okay.
+        return Promise.resolve(_command).then(function(value) {
+          return new Promise(function(resolve, reject) {
+            _command = value
+            
+            resolve(replaceTokensAndStart())
+          })
+        })
+        
     }
-    var command = _replaceTokens(_command, tokens);
+    else {
+      return replaceTokensAndStart()
+    } 
+    
+    function replaceTokensAndStart() {
+      var command = _replaceTokens(_command, tokens);
 
-    return new Promise(function(resolve, reject) {
-        // TODO: proc_man.startProcess doesn't return Promise
-        // can we know when the process is ready without ipc?
-        proc_man.startProcess(command);
-        resolve();
-    });
+      return new Promise(function(resolve, reject) {
+          // TODO: proc_man.startProcess doesn't return Promise
+          // can we know when the process is ready without ipc?
+          proc_man.startProcess(command);
+          resolve();
+      }); 
+    }
 }
 
 /**
