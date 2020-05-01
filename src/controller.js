@@ -19,7 +19,8 @@ var url = require('url'),
     Spinner = require('cli-spinner').Spinner,
     spinner = new Spinner('[%s]'),
     https = require('https'),
-    requireg = require('requireg');
+    requireg = require('requireg'),
+    chalk = require('chalk');
 
 var fc = {};
 
@@ -357,7 +358,7 @@ fc.changeArtwork = function() {
 
         //artwork extension not installed, don't update
         if (!new_format) {
-            console.error('\x1b[31m', 'The artwork format is not installed:', new_artwork.format,'\n');
+            console.error(chalk.red('The artwork format is not installed: ' + new_artwork.format + '\n'));
             return reject();
         }
 
