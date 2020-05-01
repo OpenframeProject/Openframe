@@ -72,7 +72,10 @@ function downloadFile(file_url, file_output_name) {
       reject()
     })
     .on('progress', function (state) {
-        if (debug.enabled) logSingleLine((state.percent*100).toFixed(2) + '% of ' + prettyBytes(state.size.total)+ ' – ' + humanizeDuration(state.time.remaining * 1000, { round: true }) + ' remaining – ' + (state.speed != null ? prettyBytes(state.speed) : '?') + '/s')
+        if (debug.enabled) {
+          if (state.size.total) logSingleLine((state.percent*100).toFixed(2) + '% of ' + prettyBytes(state.size.total)+ ' – ' + humanizeDuration(state.time.remaining * 1000, { round: true }) + ' remaining – ' + (state.speed != null ? prettyBytes(state.speed) : '?') + '/s')
+          else logSingleLine('Total download size unkown')
+        }
     })
     .pipe(fs.createWriteStream(file_path).on("error", function(err) {
       console.log("Error saving artwork")
