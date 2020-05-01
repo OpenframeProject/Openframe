@@ -32,6 +32,7 @@
   ],
   "license": "GPL-3.0",
   "dependencies": {
+    "chalk": "^2.4.2",
     "cli-spinner": "^0.2.4",
     "commander": "^2.8.1",
     "debug": "^2.2.0",
