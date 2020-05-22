@@ -14,7 +14,9 @@ const fs = require('fs'),
   debug = require('debug')('openframe:downloader'),
   status = require('http-status'),
   prettyBytes = require('pretty-bytes'),
-  humanizeDuration = require('humanize-duration');  
+  humanizeDuration = require('humanize-duration'),
+  chalk = require('chalk');
+
 
 const artworkDir = '/tmp';
 
@@ -57,8 +59,10 @@ function downloadFile(file_url, file_output_name) {
       // console.log(response.statusCode)
       // console.log(response.headers['content-type'])
       if (!(/^2/.test('' + response.statusCode))) { // Status Codes other than 2xx
-        console.log("The artwork is not available.")
-        console.log("Server responded with this status code:", response.statusCode, status[response.statusCode]);
+        console.error(
+          chalk.red("The artwork is not available.\n"),
+          "Server responded with this status code " + chalk.yellow(response.statusCode + " " + status[response.statusCode])
+        );
         reject()
       }
     })
