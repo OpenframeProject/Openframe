@@ -279,12 +279,12 @@ fc.connect = function(userId) {
         // XXX - POTENTIAL BUG - catch extension init error separately, otherwise a new frame is created.
         frame
             .fetch()
+            .then(readyToConnect)
             .then(function() {
                 debug('ready to init...');
                 // initExtensions now always resolves, is never rejected
                 return ext_man.initExtensions(frame.state.extensions, fc.extensionApi);
-            })
-            .then(readyToConnect)
+            })          
             .catch(function(err) {
                 debug(err);
                 fc.registerNewFrame(userId)
