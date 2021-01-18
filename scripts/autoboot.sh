@@ -4,7 +4,7 @@
 read -t 1 -n 1 key
     if [[ $key = n ]]
 then
-    echo "no openframe"
+    echo "Skip booting Openframe."
 else
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
         echo "logged in via SSH"
