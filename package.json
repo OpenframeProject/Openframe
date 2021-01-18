@@ -60,7 +60,7 @@
     "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
     "sinon": "^1.17.2",
-    "npm": "^3.5.3"
+    "npm": "^6.14.6"
   },
   "keywords": [
     "openframe",
